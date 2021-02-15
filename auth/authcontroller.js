@@ -139,7 +139,7 @@ router.post('/checkGatsbySig', async function(req, res){
     // console.log(`Dataremote: ${dataRemote}`);
     client.database.getAccounts([`${account}`])
     .then(results => {
-        console.log(`Found: ${results.length}`);
+        // console.log(`Found: ${results.length}`);
         if(results.length > 0){ //we found one record
             const postingAccount = results[0].posting;
             const key = postingAccount.key_auths[0].find(item => item === dataRemote);
@@ -151,8 +151,10 @@ router.post('/checkGatsbySig', async function(req, res){
                 //expires in 12 hrs
                 var token = jwt.sign({ usernameHive: account }, 
                     config.secret, { expiresIn: 43200 });
-                console.log(`Received at:\n${time}`);
-                console.log(`User:${account}, auth:True.`);
+                if(config.testingData){
+                    console.log(`Received at:\n${time}`);
+                    console.log(`User:${account}, auth:True.`);
+                }
                 //test to set the token on headers
                 let RES = res.set('Authorization', `Bearer ${token}`);
                 RES.set('ExpiresIn','12h');
@@ -160,8 +162,10 @@ router.post('/checkGatsbySig', async function(req, res){
                 // return res.status(200).send({ auth: true, token: token, message: 'Access Granted...Finally!' });
             }else{
                 //signature failed test, maybe corrupted or altered but with same lenght
-                console.log(`Received at:\n${time}`);
-                console.log(`User:${account}, auth:False.\nReason: Signature provided failed authentication!!!.`);
+                if(config.testingData){
+                    console.log(`Received at:\n${time}`);
+                    console.log(`User:${account}, auth:False.\nReason: Signature provided failed authentication!!!.`);
+                }
                 return res.status(500).send({ auth: false, message: 'Signature provided failed authentication!!!.' });
             }
         }else{//no user found on API DB Hive

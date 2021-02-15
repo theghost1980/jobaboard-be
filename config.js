@@ -4,4 +4,5 @@ module.exports = {
     'moreSecret': process.env.StarWars,
     'authRouteEP': process.env.auth_route,
     'userEP': process.env.users_access,
+    'testingData': process.env.testing_data;
 }

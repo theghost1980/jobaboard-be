@@ -122,6 +122,9 @@ router.post('/checkUser',function(req, res){
 
 //new tests based on data from client-gatsby
 router.post('/checkGatsbySig', async function(req, res){
+    if(config.testingData){
+        console.log('A request has been made! -testing mode-');
+    }
     const time = new Date();
     const { signature, account } = req.body;
     try {

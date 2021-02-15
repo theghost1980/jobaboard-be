@@ -8,3 +8,6 @@ var port = process.env.PORT || 3000;
 app.listen(port, function() {
     console.log('Express server listening on port ' + port);
 });
+
+// to check live logs errors on terminal:
+// heroku logs --tail --app backendjab

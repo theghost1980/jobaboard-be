@@ -1,8 +1,9 @@
 require('dotenv').config();
 var app = require('./app');
 // console.log(`port:${process.env.PORT}`);
-if(process.env.testing_data){
+if(process.env.testing_data === 'true'){
     console.log('Welcome to the Back End Hive API server. v.0.1');
+    console.log('Express server listening on port ' + port);
 }
 var port = process.env.PORT || 3000;
 app.listen(port, function() {

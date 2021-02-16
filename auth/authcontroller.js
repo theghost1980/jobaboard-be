@@ -122,7 +122,7 @@ router.post('/checkUser',function(req, res){
 
 //new tests based on data from client-gatsby
 router.post('/checkGatsbySig', async function(req, res){
-    if(config.testingData){
+    if(config.testingData === 'true'){
         console.log('A request has been made! -testing mode-');
     }
     const time = new Date();
@@ -151,7 +151,7 @@ router.post('/checkGatsbySig', async function(req, res){
                 //expires in 12 hrs
                 var token = jwt.sign({ usernameHive: account }, 
                     config.secret, { expiresIn: 43200 });
-                if(config.testingData){
+                if(config.testingData === 'true'){
                     console.log(`Received at:\n${time}`);
                     console.log(`User:${account}, auth:True.`);
                 }
@@ -162,7 +162,7 @@ router.post('/checkGatsbySig', async function(req, res){
                 // return res.status(200).send({ auth: true, token: token, message: 'Access Granted...Finally!' });
             }else{
                 //signature failed test, maybe corrupted or altered but with same lenght
-                if(config.testingData){
+                if(config.testingData === 'true'){
                     console.log(`Received at:\n${time}`);
                     console.log(`User:${account}, auth:False.\nReason: Signature provided failed authentication!!!.`);
                 }

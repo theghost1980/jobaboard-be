@@ -5,4 +5,6 @@ module.exports = {
     'authRouteEP': process.env.auth_route,
     'userEP': process.env.users_access,
     'testingData': process.env.testing_data,
+    'apiHive': process.env.apiHive,
+    'notiEP': process.env.access_notifications,
 }

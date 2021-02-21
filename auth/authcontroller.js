@@ -9,7 +9,7 @@ var bcrypt = require('bcryptjs');
 var config = require('../config');
 //dhive
 const { Client, Signature, cryptoUtils } = require("@hiveio/dhive");
-const client = new Client("https://api.hive.blog");
+const client = new Client(config.apiHive);
 
 // TODO: Check with the tutorial too see if the code match or there is an eror related to the password checks/assignments.
 
@@ -125,6 +125,7 @@ router.post('/checkGatsbySig', async function(req, res){
     if(config.testingData === 'true'){
         console.log('A request has been made! -testing mode-');
     }
+    var userT = 'user';
     const time = new Date();
     const { signature, account } = req.body;
     try {
@@ -148,17 +149,61 @@ router.post('/checkGatsbySig', async function(req, res){
                 // as founded send user's profile pic from hive just in case there is none in mongoDB
                 const JSON_metadata = JSON.parse(results[0].posting_json_metadata);
                 const profile_PicURL = JSON_metadata.profile.profile_image || 'noPicSet';
-                //expires in 12 hrs
+                //expires in 6 hrs
                 var token = jwt.sign({ usernameHive: account }, 
-                    config.secret, { expiresIn: 43200 });
-                if(config.testingData === 'true'){
-                    console.log(`Received at:\n${time}`);
-                    console.log(`User:${account}, auth:True.`);
-                }
+                    config.secret, { expiresIn: 21600 });
                 //test to set the token on headers
                 let RES = res.set('Authorization', `Bearer ${token}`);
-                RES.set('ExpiresIn','12h');
-                return RES.status(200).send({ auth: true, token: token, message: 'Access Granted!', profile_PicURL: profile_PicURL });
+                RES.set('ExpiresIn','6h');
+                //TODO
+                //check user on mongoDB(username-hive account must be UNIQUE)
+                // executes, passing results to callback
+                // MyModel.find({ name: 'john', age: { $gte: 18 }}, function (err, docs) {});
+                User.findOne({ username: account },function(err, usr){
+                    if(err){
+                        console.log('There was a problem finding the user on DB');
+                        console.log(err);
+                    };
+                    if(!usr){
+                        console.log('User not found on DB');
+                        console.log('Now we should create it');
+                        //user's creation
+                        User.create({
+                            username: account,
+                            pk: key,
+                            avatar: profile_PicURL,
+                            usertype: 'user',
+                            createdAt: time,
+                            },
+                            function(err, user){
+                                if(err){
+                                    console.log('Error trying to add new user on DB!');
+                                    console.log(err);
+                                }
+                                if(user){
+                                    console.log(`Created User on DB. \nname:${user.username} \ntype:${user.usertype} \nTime:${time}`);
+                                    userT = user.usertype;
+                                } 
+                            }
+                        );
+                    }else if(usr){
+                        console.log('User found:',usr.username);
+                        console.log('User type:',usr.usertype);
+                        userT = usr.usertype;
+                    }
+                });
+                //if found returns it foto profile, if not present send hive profilePICurl
+                //if not found register as new on db.
+                if(config.testingData === 'true'){
+                    console.log(`Received at:\n${time}`);
+                    console.log(`User:${account}, auth:True.\nType:${userT}`);
+                }
+                return RES.status(200).send({   auth: true, 
+                                                token: token, 
+                                                message: 'Access Granted!', 
+                                                profile_PicURL: profile_PicURL,
+                                                usertype: userT,
+                                            });
                 // return res.status(200).send({ auth: true, token: token, message: 'Access Granted...Finally!' });
             }else{
                 //signature failed test, maybe corrupted or altered but with same lenght

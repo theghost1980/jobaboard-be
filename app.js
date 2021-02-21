@@ -14,8 +14,12 @@ if(config.testingData === 'true'){
 app.use(config.authRouteEP, authcontroller);
 
 //user definitions
-// var UserController = require('./user/UserController');
-// app.use(config.userEP, UserController);
+var UserController = require('./user/UserController');
+app.use(config.userEP, UserController);
+//notifications
+var NotiController = require('./user/NotiController');
+app.use(config.notiEP, NotiController);
+
 module.exports = app;
 
 // // testing using curl locally

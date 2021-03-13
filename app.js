@@ -7,16 +7,15 @@ const config = require('./config');
 //use cors
 app.use( cors() );
 //authorization End Point/Controller
-console.log('Here works?????')
-// var authcontroller = require('./auth/Authcontroller.js');
-console.log('And Here works?????')
+
 if(config.testingData === 'true'){
     console.log(`Auth Route:${config.authRouteEP}`);
     console.log(`User Access:${config.userEP}`);
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
 }
-app.use(config.authRouteEP, authcontroller);
+var Authcontroller = require('./auth/Authcontroller.js');
+app.use(config.authRouteEP, Authcontroller);
 
 //user definitions
 var UserController = require('./user/UserController.js');

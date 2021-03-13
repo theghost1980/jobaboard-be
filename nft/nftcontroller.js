@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-var Nft = require('./nft');
+var Nft = require('./Nft');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 const time = new Date();

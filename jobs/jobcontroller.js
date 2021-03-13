@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-var Job = require('./job');
+var Job = require('./Job');
 var jwt = require('jsonwebtoken');
 var config = require('../config');
 const time = new Date();

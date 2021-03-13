@@ -8,7 +8,7 @@ const config = require('./config');
 app.use( cors() );
 //authorization End Point/Controller
 console.log('Here works?????')
-var authcontroller = require('./auth/authcontroller.js');
+var authcontroller = require('./auth/Authcontroller.js');
 console.log('And Here works?????')
 if(config.testingData === 'true'){
     console.log(`Auth Route:${config.authRouteEP}`);
@@ -25,18 +25,18 @@ app.use(config.userEP, UserController);
 var NotiController = require('./user/NotiController.js');
 app.use(config.notiEP, NotiController);
 //logs
-var LogsController = require('./logs/logscontroller.js');
+var LogsController = require('./logs/Logscontroller.js');
 app.use(config.adminEP, LogsController);
 //admins operations: Ban, update, etc.
 //logs
-var AdminsController = require('./admins/admincontroller.js');
+var AdminsController = require('./admins/Admincontroller.js');
 app.use(config.adminEP, AdminsController);
 //jobs
-var JobController = require('./jobs/jobcontroller.js');
+var JobController = require('./jobs/Jobcontroller.js');
 app.use(config.jobEP, JobController);
 // //jobs
-// var JobController = require('./jobs/jobcontroller.js');
-// app.use(config.adminEP, JobController);
+var JobController = require('./jobs/Jobcontroller.js');
+app.use(config.adminEP, JobController);
 
 module.exports = app;
 

@@ -17,23 +17,23 @@ if(config.testingData === 'true'){
 app.use(config.authRouteEP, authcontroller);
 
 //user definitions
-var UserController = require('./user/UserController');
+var UserController = require('./user/UserController.js');
 app.use(config.userEP, UserController);
 //notifications
-var NotiController = require('./user/NotiController');
+var NotiController = require('./user/NotiController.js');
 app.use(config.notiEP, NotiController);
 //logs
-var LogsController = require('./logs/logscontroller');
+var LogsController = require('./logs/logscontroller.js');
 app.use(config.adminEP, LogsController);
 //admins operations: Ban, update, etc.
 //logs
-var AdminsController = require('./admins/admincontroller');
+var AdminsController = require('./admins/admincontroller.js');
 app.use(config.adminEP, AdminsController);
 //jobs
-var JobController = require('./jobs/jobcontroller');
+var JobController = require('./jobs/jobcontroller.js');
 app.use(config.jobEP, JobController);
 //jobs
-var JobController = require('./jobs/jobcontroller');
+var JobController = require('./jobs/jobcontroller.js');
 app.use(config.adminEP, JobController);
 
 module.exports = app;

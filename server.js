@@ -1,5 +1,5 @@
 require('dotenv').config();
-var app = require('./App');
+var app = require('./app.js');
 var port = process.env.PORT || 3000;
 // console.log(`port:${process.env.PORT}`);
 if(process.env.testing_data === 'true'){

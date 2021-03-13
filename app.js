@@ -14,7 +14,7 @@ if(config.testingData === 'true'){
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
 }
-var Authcontroller = require('./Auth/Authcontroller');
+var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
 
 //user definitions

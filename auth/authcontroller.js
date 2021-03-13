@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded( { extended: false }));
 router.use(bodyParser.json());
 var User = require('../user/User');
+var Logs = require('../logs/Logs');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var config = require('../config');
@@ -107,6 +108,7 @@ const client = new Client(config.apiHive);
 //         console.log(`DateTime:${dateTime}`);
 //     });
 // });
+
 //check active token and valid one
 //find user who is already logged in, anytime a new request is being made,
 // i.e. check profile, save data or create contracts.
@@ -122,10 +124,14 @@ router.post('/checkUser',function(req, res){
 
 //new tests based on data from client-gatsby
 router.post('/checkGatsbySig', async function(req, res){
+    //dummy image if user not have profileImg set
+    var profile_PicURL = "https://res.cloudinary.com/dbcugb6j4/image/upload/v1614450740/dummy-profilePic_ogyaoc.png";
+
     if(config.testingData === 'true'){
-        console.log('A request has been made! -testing mode-');
+        console.log('A request AUTH/keychain has been made! -testing mode-');
     }
     var userT = 'user';
+    var banned = false;
     const time = new Date();
     const { signature, account } = req.body;
     try {
@@ -142,23 +148,38 @@ router.post('/checkGatsbySig', async function(req, res){
     .then(results => {
         // console.log(`Found: ${results.length}`);
         if(results.length > 0){ //we found one record
+            // console.log(results[0]);
             const postingAccount = results[0].posting;
+            // console.log(results[0].posting);
+            // console.log(dataRemote);
             const key = postingAccount.key_auths[0].find(item => item === dataRemote);
             // console.log(key);
             if(key){
                 // as founded send user's profile pic from hive just in case there is none in mongoDB
-                const JSON_metadata = JSON.parse(results[0].posting_json_metadata);
-                const profile_PicURL = JSON_metadata.profile.profile_image || 'noPicSet';
+                //one case to test if the profile is brand new it wont have profile image
+                // console.log(results[0]);
+                //if the account is brandnew .posting_json_metadata = '' so let's verify that first
+                console.log(results[0]);
+                //now I should check if there is any profile pic on user.s hive profile
+                try {
+                    //try to parse the posting_json_metadata if error then is brand new or not image set
+                    //the account has been used to it may have profile picture already set
+                    const JSON_metadata = JSON.parse(results[0].posting_json_metadata);
+                    console.log(JSON_metadata);
+                    if(JSON_metadata.profile.profile_image){
+                        profile_PicURL = JSON_metadata.profile.profile_image;
+                        }
+                    } catch (error) {
+                        console.log('Brand new user or not image set on profile.');
+                        console.log(`Selected temporary image as:\n${profile_PicURL}`)
+                    }
+                // var profile_PicURL = JSON_metadata.profile.profile_image || 'noPicSet';
                 //expires in 6 hrs
                 var token = jwt.sign({ usernameHive: account }, 
                     config.secret, { expiresIn: 21600 });
                 //test to set the token on headers
                 let RES = res.set('Authorization', `Bearer ${token}`);
                 RES.set('ExpiresIn','6h');
-                //TODO
-                //check user on mongoDB(username-hive account must be UNIQUE)
-                // executes, passing results to callback
-                // MyModel.find({ name: 'john', age: { $gte: 18 }}, function (err, docs) {});
                 User.findOne({ username: account },function(err, usr){
                     if(err){
                         console.log('There was a problem finding the user on DB');
@@ -183,6 +204,7 @@ router.post('/checkGatsbySig', async function(req, res){
                                 if(user){
                                     console.log(`Created User on DB. \nname:${user.username} \ntype:${user.usertype} \nTime:${time}`);
                                     userT = user.usertype;
+                                    banned = user.banned;
                                 } 
                             }
                         );
@@ -190,20 +212,44 @@ router.post('/checkGatsbySig', async function(req, res){
                         console.log('User found:',usr.username);
                         console.log('User type:',usr.usertype);
                         userT = usr.usertype;
+                        banned = usr.banned;
+                        if(usr.avatar){
+                            //user has picture so assign it
+                            console.log('User has avatar on mongoDB!');
+                            profile_PicURL = usr.avatar;
+                        }
                     }
+                    //if found returns it foto profile, if not present send hive profilePICurl
+                    //if not found register as new on db.
+                    //create log
+                    Logs.create({
+                        username: account,
+                        usertype: userT,
+                        createdAt: time,
+                        ipaddress: req.ip,
+                        event: 'Login in',
+                        banned: banned,
+                        },
+                        function(err, log){
+                            if(err){console.log('Error trying to add new Log on DB!',err)}
+                            if(log){ 
+                                console.log(`logID:${log.id}`);
+                            } 
+                        }
+                    );
+                    if(config.testingData === 'true'){
+                        console.log(`Received at:\n${time}`);
+                        console.log(`User:${account}, auth:True.\nType:${userT}`);
+                        console.log(`Create Log - Login event. Registered)`);
+                    }
+                    return RES.status(200).send({   auth: true, 
+                                                    token: token, 
+                                                    message: 'Access Granted!', 
+                                                    profile_PicURL: profile_PicURL,
+                                                    usertype: userT,
+                                                    banned: banned,
+                                                });
                 });
-                //if found returns it foto profile, if not present send hive profilePICurl
-                //if not found register as new on db.
-                if(config.testingData === 'true'){
-                    console.log(`Received at:\n${time}`);
-                    console.log(`User:${account}, auth:True.\nType:${userT}`);
-                }
-                return RES.status(200).send({   auth: true, 
-                                                token: token, 
-                                                message: 'Access Granted!', 
-                                                profile_PicURL: profile_PicURL,
-                                                usertype: userT,
-                                            });
                 // return res.status(200).send({ auth: true, token: token, message: 'Access Granted...Finally!' });
             }else{
                 //signature failed test, maybe corrupted or altered but with same lenght
@@ -223,23 +269,65 @@ router.post('/checkGatsbySig', async function(req, res){
         console.log(error);
         return res.status(404).send({ auth: false, message: 'Error trying to fetch API Hive node.' });
     })
+});
 
-    // console.log(`Result:${result}, message:${message}`);
-    // if(result == 200){//generate JWT token and send it back.
-    //     //expires in 12 hrs
-    //     var token = jwt.sign({ mail: user.email }, 
-    //         config.secret, { expiresIn: 43200 });
-    //     const time = new Date();
-    //     console.log(`Received at:\n${time}`);
-    //     console.log(`User:${account}, auth:True.`);
-    //     return res.status(200).send({ auth: true, token: token, message: message });
-    // } else {
-    //     const time = new Date();
-    //     console.log(`Received at:\n${time}`);
-    //     console.log(`User:${account}, auth:False.\nReason:${message}`);
-    //     return res.status(404).send({ auth: false, message: message });
-    // }
-    // return res.status(200).send({ message: 'Received Biatch Keep the good work'});
+//When user log in using Hivesigner
+router.post('/checkGatsbySig2', async function(req, res){
+    if(config.testingData === 'true'){
+        console.log('A request AUTH/hivesign has been made! -testing mode-');
+    }
+    var userT = 'user';
+    const time = new Date();
+    const { account } = req.body;
+    var token = jwt.sign({ usernameHive: account }, 
+        config.secret, { expiresIn: 21600 });
+    //test to set the token on headers
+    let RES = res.set('Authorization', `Bearer ${token}`);
+    RES.set('ExpiresIn','6h');
+    User.findOne({ username: account },function(err, usr){
+        if(err){
+            console.log('There was a problem finding the user on DB');
+            console.log(err);
+        };
+        if(!usr){
+            console.log('User not found on DB');
+            console.log('Now we should create it');
+            //user's creation
+            User.create({
+                username: account,
+                pk: '',
+                avatar: '',
+                usertype: 'user',
+                createdAt: time,
+                },
+                function(err, user){
+                    if(err){
+                        console.log('Error trying to add new user on DB!');
+                        console.log(err);
+                    }
+                    if(user){
+                        console.log(`Created User on DB. \nname:${user.username} \ntype:${user.usertype} \nTime:${time}`);
+                        userT = user.usertype;
+                    } 
+                }
+            );
+        }else if(usr){
+            console.log('User found:',usr.username);
+            console.log('User type:',usr.usertype);
+            userT = usr.usertype;
+        }
+
+        if(config.testingData === 'true'){
+            console.log(`Received at:\n${time}`);
+            console.log(`User:${account}, auth:True.\nType:${userT}`);
+        }
+        return RES.status(200).send({   auth: true, 
+                                        token: token, 
+                                        message: 'Access Granted!', 
+                                        profile_PicURL: usr.avatar,
+                                        usertype: userT,
+                                    });
+    });
 });
 
 /////////////////////

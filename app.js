@@ -3,13 +3,16 @@ var app = express();
 var cors = require('cors')
 var db = require('./db');
 const config = require('./config');
+// const fileupload = require('express-fileupload')
 //use cors
-app.use(cors());
+app.use( cors() );
 //authorization End Point/Controller
 var authcontroller = require('./auth/authcontroller');
 if(config.testingData === 'true'){
     console.log(`Auth Route:${config.authRouteEP}`);
     console.log(`User Access:${config.userEP}`);
+    console.log(`Admin Access:${config.adminEP}`);
+    console.log(`Job Access:${config.jobEP}`);
 }
 app.use(config.authRouteEP, authcontroller);
 
@@ -19,6 +22,19 @@ app.use(config.userEP, UserController);
 //notifications
 var NotiController = require('./user/NotiController');
 app.use(config.notiEP, NotiController);
+//logs
+var LogsController = require('./logs/logscontroller');
+app.use(config.adminEP, LogsController);
+//admins operations: Ban, update, etc.
+//logs
+var AdminsController = require('./admins/admincontroller');
+app.use(config.adminEP, AdminsController);
+//jobs
+var JobController = require('./jobs/jobcontroller');
+app.use(config.jobEP, JobController);
+//jobs
+var JobController = require('./jobs/jobcontroller');
+app.use(config.adminEP, JobController);
 
 module.exports = app;
 

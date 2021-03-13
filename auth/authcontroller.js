@@ -3,13 +3,13 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded( { extended: false }));
 router.use(bodyParser.json());
-var User = require('../user/User');
-var Logs = require('../logs/Logs');
+var User = require('../User/User');
+var Logs = require('../Logs/Logs');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var config = require('../config');
 //dhive
-const { Client, Signature, cryptoUtils } = require("@hiveio/dhive");
+const { Client, Signature, cryptoUtils } = require('@hiveio/dhive');
 const client = new Client(config.apiHive);
 
 // TODO: Check with the tutorial too see if the code match or there is an eror related to the password checks/assignments.

@@ -14,27 +14,27 @@ if(config.testingData === 'true'){
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
 }
-var Authcontroller = require('./auth/Authcontroller.js');
+var Authcontroller = require('./Auth/Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
 
 //user definitions
-var UserController = require('./user/UserController.js');
+var UserController = require('./User/UserController.js');
 app.use(config.userEP, UserController);
 //notifications
-var NotiController = require('./user/NotiController.js');
+var NotiController = require('./User/NotiController.js');
 app.use(config.notiEP, NotiController);
 //logs
-var LogsController = require('./logs/Logscontroller.js');
+var LogsController = require('./Logs/logscontroller.js');
 app.use(config.adminEP, LogsController);
 //admins operations: Ban, update, etc.
 //logs
-var AdminsController = require('./admins/Admincontroller.js');
+var AdminsController = require('./Admins/admincontroller.js');
 app.use(config.adminEP, AdminsController);
 //jobs
-var JobController = require('./jobs/Jobcontroller.js');
+var JobController = require('./Jobs/Jobcontroller.js');
 app.use(config.jobEP, JobController);
 // //jobs
-var JobController = require('./jobs/Jobcontroller.js');
+var JobController = require('./Jobs/Jobcontroller.js');
 app.use(config.adminEP, JobController);
 
 module.exports = app;

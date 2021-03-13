@@ -18,23 +18,23 @@ var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
 
 //user definitions
-var UserController = require('./User/UserController.js');
+var UserController = require('./UserController.js');
 app.use(config.userEP, UserController);
 //notifications
-var NotiController = require('./User/NotiController.js');
+var NotiController = require('./NotiController.js');
 app.use(config.notiEP, NotiController);
 //logs
-var LogsController = require('./Logs/logscontroller.js');
+var LogsController = require('./Logscontroller.js');
 app.use(config.adminEP, LogsController);
 //admins operations: Ban, update, etc.
 //logs
-var AdminsController = require('./Admins/admincontroller.js');
+var AdminsController = require('./Admincontroller.js');
 app.use(config.adminEP, AdminsController);
 //jobs
-var JobController = require('./Jobs/Jobcontroller.js');
+var JobController = require('./Jobcontroller.js');
 app.use(config.jobEP, JobController);
 // //jobs
-var JobController = require('./Jobs/Jobcontroller.js');
+var JobController = require('./Jobcontroller.js');
 app.use(config.adminEP, JobController);
 
 module.exports = app;

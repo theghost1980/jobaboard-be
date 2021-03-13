@@ -7,7 +7,9 @@ const config = require('./config');
 //use cors
 app.use( cors() );
 //authorization End Point/Controller
+console.log('Here works?????')
 var authcontroller = require('./auth/authcontroller');
+console.log('And Here works?????')
 if(config.testingData === 'true'){
     console.log(`Auth Route:${config.authRouteEP}`);
     console.log(`User Access:${config.userEP}`);

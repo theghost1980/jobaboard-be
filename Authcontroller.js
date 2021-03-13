@@ -3,11 +3,11 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded( { extended: false }));
 router.use(bodyParser.json());
-var User = require('../User/User');
-var Logs = require('../Logs/Logs');
+var User = require('./User/User');
+var Logs = require('./Logs/Logs');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
-var config = require('../config');
+var config = require('./config');
 //dhive
 const { Client, Signature, cryptoUtils } = require('@hiveio/dhive');
 const client = new Client(config.apiHive);

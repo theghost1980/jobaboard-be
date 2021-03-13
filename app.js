@@ -32,9 +32,9 @@ app.use(config.adminEP, AdminsController);
 //jobs
 var JobController = require('./jobs/jobcontroller.js');
 app.use(config.jobEP, JobController);
-//jobs
-var JobController = require('./jobs/jobcontroller.js');
-app.use(config.adminEP, JobController);
+// //jobs
+// var JobController = require('./jobs/jobcontroller.js');
+// app.use(config.adminEP, JobController);
 
 module.exports = app;
 

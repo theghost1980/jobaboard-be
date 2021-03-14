@@ -39,7 +39,7 @@ app.use(config.adminEP, JobController);
 
 // testing SSC 
 var Testssc = require('./TestSSC');
-app.use(config.adminEP, Testssc);
+app.use('/ssc/ssctest', Testssc);
 
 module.exports = app;
 

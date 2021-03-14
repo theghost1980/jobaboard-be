@@ -14,7 +14,7 @@ const ssc = new SSC('http://185.130.45.130:5000/');
 
 //get all NFT issued by main acc.
 router.get('/allNFTs', function(req, res){
-    // console.log(req.params);
+    console.log(req.params);
     // if(checkId(req.params.id.toString())){
     ////////////
     //check for a valid token

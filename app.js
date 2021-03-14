@@ -13,6 +13,7 @@ if(config.testingData === 'true'){
     console.log(`User Access:${config.userEP}`);
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
+    console.log(`NFT Access:${config.nft_EP}`);
 }
 var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
@@ -38,8 +39,8 @@ var JobController = require('./Jobcontroller.js');
 app.use(config.adminEP, JobController);
 
 // testing SSC 
-var Testssc = require('./TestSSC');
-app.use('/ssc/ssctest', Testssc);
+var SSCController = require('./TestSSC');
+app.use(config.nft_EP, SSCController);
 
 module.exports = app;
 

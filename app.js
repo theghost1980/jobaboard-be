@@ -37,6 +37,10 @@ app.use(config.jobEP, JobController);
 var JobController = require('./Jobcontroller.js');
 app.use(config.adminEP, JobController);
 
+// testing SSC 
+var Testssc = require('./TestSSC');
+app.use(config.adminEP, Testssc);
+
 module.exports = app;
 
 // // testing using curl locally

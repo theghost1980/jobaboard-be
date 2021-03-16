@@ -14,4 +14,5 @@ module.exports = {
     'api_key': process.env.api_key,
     'api_secret': process.env.api_secret,
     'SSC_node': process.env.ssc_node,
+    'portfolioEP': process.env.portfolio_EP,
 }

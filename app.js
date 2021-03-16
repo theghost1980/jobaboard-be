@@ -14,6 +14,7 @@ if(config.testingData === 'true'){
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
     console.log(`NFT Access:${config.nft_EP}`);
+    console.log(`Portfolio Access:${config.portfolioEP}`);
 }
 var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
@@ -37,6 +38,9 @@ app.use(config.jobEP, JobController);
 // //jobs
 var JobController = require('./Jobcontroller.js');
 app.use(config.adminEP, JobController);
+// Portfolio route
+var PortfolioController = require('./Portfoliocontroller');
+app.use(config.portfolioEP,PortfolioController);
 
 // testing SSC 
 var SSCController = require('./TestSSC');

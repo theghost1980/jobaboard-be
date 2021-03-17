@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var PortfolioSchema = new mongoose.Schema({
     username: {
         type: String,
-        index: true,
         required: true,
         unique: true,
     },

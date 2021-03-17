@@ -53,9 +53,9 @@ router.post('/create', function(req, res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             console.log(`Decoded:${decoded.usernameHive}`);
-            var data = {};
-            data = req.body;
-            Portfolio.create(data,function(err, portfolio){
+            // var data = {};
+            // data = req.body;
+            Portfolio.create(req.body,function(err, portfolio){
                 if(err){
                     console.log('Error trying to add new portfolio on DB!',err);
                     return res.status(500).send({message: 'Error trying to add portfolio', error: err});

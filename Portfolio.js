@@ -18,7 +18,6 @@ var PortfolioSchema = new mongoose.Schema({
     }],
     education: [{
         country: String,
-        title_degree: String,
         degree: String,
         year: String,
     }],

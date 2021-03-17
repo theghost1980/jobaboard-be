@@ -62,22 +62,23 @@ router.post('/create', function(req, res){
                     data = req.body;
                     if(config.testingData){
                         console.log("To add:");
-                        console.log({data});
+                        console.log(data.username);
+                        console.log(req.body.data);
                     }
-                    Portfolio.create(data,
-                        function(err, portfolio){
-                            if(err){
-                                console.log('Error trying to add new portfolio on DB!',err);
-                                return res.status(500).send({message: 'Error trying to add portfolio', error: err});
-                            }
-                            if(portfolio){
-                                res.status(200).send(portfolio);
-                                if(config.testingData){
-                                    console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-                                }
-                            } 
-                        }
-                    );
+                    // Portfolio.create(data,
+                    //     function(err, portfolio){
+                    //         if(err){
+                    //             console.log('Error trying to add new portfolio on DB!',err);
+                    //             return res.status(500).send({message: 'Error trying to add portfolio', error: err});
+                    //         }
+                    //         if(portfolio){
+                    //             res.status(200).send(portfolio);
+                    //             if(config.testingData){
+                    //                 console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                    //             }
+                    //         } 
+                    //     }
+                    // );
                 };
             });
         }else{

@@ -52,29 +52,20 @@ router.post('/create', function(req, res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            //search portfolio under this username
-            Portfolio.find({ username: decoded.usernameHive }, function (err, docs) {
-                if(err) return res.status(500).send("There was a problem finding the user's portfolio." + "\n" + err);
-                if(!docs || docs.length <= 0) {
-                    //means not founf so create it
-                    // before adding let's test the data and see it
-                    var data = {};
-                    data = req.body;
-                    Portfolio.create(data,
-                        function(err2, portfolio){
-                            if(err2){
-                                console.log('Error trying to add new portfolio on DB!',err2);
-                                return res.status(500).send({message: 'Error trying to add portfolio', error: err2});
-                            }
-                            if(portfolio){
-                                res.status(200).send(portfolio);
-                                if(config.testingData){
-                                    console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-                                }
-                            } 
-                        }
-                    );
-                };
+            console.log(`Decoded:${decoded.usernameHive}`);
+            var data = {};
+            data = req.body;
+            Portfolio.create(data,function(err, portfolio){
+                if(err){
+                    console.log('Error trying to add new portfolio on DB!',err);
+                    return res.status(500).send({message: 'Error trying to add portfolio', error: err});
+                }
+                if(portfolio){
+                    res.status(200).send(portfolio);
+                    if(config.testingData){
+                        console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                    }
+                } 
             });
         }else{
             return res.status(500).send({ auth: false, message: 'Error authenticating token GET Portfolio.' });

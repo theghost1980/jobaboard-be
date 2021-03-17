@@ -58,27 +58,22 @@ router.post('/create', function(req, res){
                 if(!docs || docs.length <= 0) {
                     //means not founf so create it
                     // before adding let's test the data and see it
-                    var data = {};
-                    data = req.body;
-                    if(config.testingData){
-                        console.log("To add:");
-                        console.log(data.username);
-                        console.log(req.body.data);
-                    }
-                    // Portfolio.create(data,
-                    //     function(err, portfolio){
-                    //         if(err){
-                    //             console.log('Error trying to add new portfolio on DB!',err);
-                    //             return res.status(500).send({message: 'Error trying to add portfolio', error: err});
-                    //         }
-                    //         if(portfolio){
-                    //             res.status(200).send(portfolio);
-                    //             if(config.testingData){
-                    //                 console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-                    //             }
-                    //         } 
-                    //     }
-                    // );
+                    // var data = {};
+                    // data = req.body;
+                    Portfolio.create(req.body,
+                        function(err, portfolio){
+                            if(err){
+                                console.log('Error trying to add new portfolio on DB!',err);
+                                return res.status(500).send({message: 'Error trying to add portfolio', error: err});
+                            }
+                            if(portfolio){
+                                res.status(200).send(portfolio);
+                                if(config.testingData){
+                                    console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                                }
+                            } 
+                        }
+                    );
                 };
             });
         }else{

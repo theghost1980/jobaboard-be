@@ -55,21 +55,27 @@ router.post('/create', function(req, res){
             console.log(`Decoded:${decoded.usernameHive}`);
             const data = req.headers['data'];
             //we parse and show for now
-            const jsonData = JSON.parse(data);
-            console.log('To print:');
-            console.log(jsonData);
-            // Portfolio.create(req.body,function(err, portfolio){
-            //     if(err){
-            //         console.log('Error trying to add new portfolio on DB!',err);
-            //         return res.status(500).send({message: 'Error trying to add portfolio', error: err});
-            //     }
-            //     if(portfolio){
-            //         res.status(200).send(portfolio);
-            //         if(config.testingData){
-            //             console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-            //         }
-            //     } 
-            // });
+            // TODO later on: we can add try/catch for json.parse
+            // if error the data came from another source or corrupted
+            var jsonData = JSON.parse(data);
+            if(config.testingData){
+                console.log('To print:');
+                console.log(jsonData);
+            }
+            //adding createdAt
+            jsonData.createdAt = jsonData.updatedAt;
+            Portfolio.create(jsonData,function(err, portfolio){
+                if(err){
+                    console.log('Error trying to add new portfolio on DB!',err);
+                    return res.status(500).send({message: 'Error trying to add portfolio', error: err});
+                }
+                if(portfolio){
+                    res.status(200).send(portfolio);
+                    if(config.testingData){
+                        console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                    }
+                } 
+            });
         }else{
             return res.status(500).send({ auth: false, message: 'Error authenticating token GET Portfolio.' });
         }

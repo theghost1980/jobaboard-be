@@ -27,8 +27,8 @@ var PortfolioSchema = new mongoose.Schema({
             year: String,
         },
     ],
-    createdAt: Date,
-    updatedAt: Date,
+    createdAt: String,
+    updatedAt: String,
 });
 mongoose.model('Portfolio',PortfolioSchema);
 

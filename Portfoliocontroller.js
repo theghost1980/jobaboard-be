@@ -58,14 +58,16 @@ router.post('/create', function(req, res){
                 if(!docs || docs.length <= 0) {
                     //means not founf so create it
                     // before adding let's test the data and see it
+                    var data = {};
+                    data = req.body;
                     if(config.testingData){
                         console.log("To add:");
-                        console.log(req.body);
+                        console.log(data);
                     }
-                    Portfolio.create(req.body,
+                    Portfolio.create(data,
                         function(err, portfolio){
                             if(err){
-                                console.log('Error trying to add new portolfio on DB!',err);
+                                console.log('Error trying to add new portfolio on DB!',err);
                                 return res.status(500).send({message: 'Error trying to add portfolio', error: err});
                             }
                             if(portfolio){

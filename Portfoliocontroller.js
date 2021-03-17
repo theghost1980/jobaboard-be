@@ -62,7 +62,7 @@ router.post('/create', function(req, res){
                     data = req.body;
                     if(config.testingData){
                         console.log("To add:");
-                        console.log(data);
+                        console.log({data});
                     }
                     Portfolio.create(data,
                         function(err, portfolio){

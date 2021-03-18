@@ -93,6 +93,26 @@ router.post('/createUpdate', function(req, res){
 });
 /////////////////////////
 
+/////////////////////////
+/////Public routes
+router.get('/queryUser',function(req,res){
+    const username = req.headers['username'];
+    if(username === ""){
+        res.status(404).send({ status: 'failed', result: 'I cannot query empty. JAB.'});
+    }else{
+        Portfolio.findOne({ username: username }, function(err,found){
+            if(err){
+                if(config.testingData){ console.log('Error getting user portfolio from PUB-EP',err)};
+                return res.status(500).send({ status: 'error', result: err});
+            }
+            if(config.testingData){ console.log('Public query portfolio made.',username)};
+            return res.status(200).send(found);
+        });
+    }
+})
+////END Public routes
+/////////////////////////
+
 //Route for Job
 //Get jobs by username
 // router.get('/:username', function(req, res){

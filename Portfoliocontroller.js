@@ -45,7 +45,7 @@ router.get('/getMyPort', function(req, res){
 
 //////////Update or create///////////
 //find/Update a portfolio
-router.post('/create', function(req, res){
+router.post('/createUpdate', function(req, res){
     //check for a valid token
     var token = req.headers['x-access-token'];
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -62,6 +62,8 @@ router.post('/create', function(req, res){
                 console.log('To print:');
                 console.log(jsonData);
             }
+            //we search to update or create as new.
+            // TODO
             //adding createdAt
             jsonData.createdAt = jsonData.updatedAt;
             Portfolio.create(jsonData,function(err, portfolio){
@@ -72,7 +74,7 @@ router.post('/create', function(req, res){
                 if(portfolio){
                     res.status(200).send(portfolio);
                     if(config.testingData){
-                        console.log(`Created Portfolio on DB. \nname:${portfolio.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                        console.log(`Created Portfolio on DB. \nname:${decoded.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
                     }
                 } 
             });

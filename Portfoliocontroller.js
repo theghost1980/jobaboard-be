@@ -64,9 +64,9 @@ router.post('/createUpdate', function(req, res){
             Portfolio.findOne({ username: decoded.usernameHive }, function(err,found){
                 if(err) return res.status(500).send({error: err});
                 if(found){ //now we update
-                    Portfolio.updateOne({ username: decoded.usernameHive }, jsonData, function(err, updated){
+                    Portfolio.findOneAndUpdate({ username: decoded.usernameHive }, jsonData, { new: true }, function(err, updated){
                         if(err) return res.status(500).send({error: err});
-                        if(config.testingData){ console.log('Port Updated!',updated)};
+                        if(config.testingData){ console.log('Portfolio Updated!',updated)};
                         return res.status(200).send({ status: 'updated', result: updated});
                     })
                 }else{ //we must create it

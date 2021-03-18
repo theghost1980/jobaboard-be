@@ -19,9 +19,9 @@ router.get('/getMyPort', function(req, res){
             // console.log(decoded);
 
             //search jobs under this username
-            Portfolio.find({ username: decoded.usernameHive }, function (err, docs) {
+            Portfolio.findOne({ username: decoded.usernameHive }, function (err, docs) {
                 if(err) return res.status(500).send("There was a problem finding the user's portfolio." + "\n" + err);
-                if(!docs || docs.length <= 0) return res.status(404).send({ message: "No portolio for this user" });
+                if(!docs) return res.status(404).send({ message: "No portolio for this user" });
                 res.status(200).send(docs);
                 if(config.testingData){
                     console.log('Token', token);

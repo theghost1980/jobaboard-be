@@ -63,7 +63,7 @@ router.post('/createUpdate', function(req, res){
                 console.log('To handle:');
                 console.log(jsonData);
             }
-            Portfolio.findOneAndUpdate({ username: decoded.usernameHive }, jsonData, { new: true }, function(found,err){
+            Portfolio.findOneAndUpdate({ username: decoded.usernameHive }, jsonData, { new: true }, function(err,found){
                 if(err) return res.status(500).send({error: err});
                 if(found){ //it returns the update applied
                     if(config.testingData){ console.log('Portfolio updated',found);}

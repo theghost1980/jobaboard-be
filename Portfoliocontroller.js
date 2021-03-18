@@ -106,7 +106,7 @@ router.get('/queryUser',function(req,res){
                 return res.status(500).send({ status: 'error', result: err});
             }
             if(config.testingData){ console.log('Public query portfolio made.',username)};
-            return res.status(200).send(found);
+            return res.status(200).send(found); 
         });
     }
 })

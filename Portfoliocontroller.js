@@ -17,8 +17,6 @@ router.get('/getMyPort', function(req, res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             // console.log(decoded);
-
-            //search jobs under this username
             Portfolio.findOne({ username: decoded.usernameHive }, function (err, docs) {
                 if(err) return res.status(500).send("There was a problem finding the user's portfolio." + "\n" + err);
                 if(!docs) return res.status(404).send({ message: "No portolio for this user" });
@@ -63,13 +61,15 @@ router.post('/createUpdate', function(req, res){
                 console.log('To handle:');
                 console.log(jsonData);
             }
-            Portfolio.findOneAndUpdate({ username: decoded.usernameHive }, jsonData, { new: true }, function(err,found){
+            Portfolio.findOne({ username: decoded.usernameHive }, function(err,found){
                 if(err) return res.status(500).send({error: err});
-                if(found){ //it returns the update applied
-                    if(config.testingData){ console.log('Portfolio updated',found);}
-                    res.status(200).send({ status:'updated',result: found}); 
+                if(found){ //now we update
+                    Portfolio.updateOne({ username: decoded.usernameHive }, jsonData, function(err, updated){
+                        if(err) return res.status(500).send({error: err});
+                        if(config.testingData){ console.log('Port Updated!',updated)};
+                        return res.status(200).send({ status: 'updated', result: updated});
+                    })
                 }else{ //we must create it
-                    res.status(404).send({ status:'failed',result: 'not found'}); 
                     //add createdAt
                     jsonData.createdAt = jsonData.updatedAt;
                     Portfolio.create(jsonData,function(err, portfolio){

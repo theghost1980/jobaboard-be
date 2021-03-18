@@ -70,18 +70,20 @@ router.post('/createUpdate', function(req, res){
                     res.status(200).send({ status:'updated',result: found}); 
                 }else{ //we must create it
                     res.status(404).send({ status:'failed',result: 'not found'}); 
-                    // Portfolio.create(jsonData,function(err, portfolio){
-                    //     if(err){
-                    //         console.log('Error trying to add new portfolio on DB!',err);
-                    //         return res.status(500).send({error: err});
-                    //     }
-                    //     if(portfolio){
-                    //         res.status(200).send({ status:'created',result: portfolio});
-                    //         if(config.testingData){
-                    //             console.log(`Created Portfolio on DB. \nname:${decoded.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-                    //         }
-                    //     } 
-                    // });
+                    //add createdAt
+                    jsonData.createdAt = jsonData.updatedAt;
+                    Portfolio.create(jsonData,function(err, portfolio){
+                        if(err){
+                            console.log('Error trying to add new portfolio on DB!',err);
+                            return res.status(500).send({error: err});
+                        }
+                        if(portfolio){
+                            res.status(200).send({ status:'created',result: portfolio});
+                            if(config.testingData){
+                                console.log(`Created Portfolio on DB. \nname:${decoded.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                            }
+                        } 
+                    });
                 }
             });
         }else{

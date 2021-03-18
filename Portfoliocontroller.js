@@ -57,26 +57,31 @@ router.post('/createUpdate', function(req, res){
             //we parse and show for now
             // TODO later on: we can add try/catch for json.parse
             // if error the data came from another source or corrupted
+            // search if found update, if not create.
             var jsonData = JSON.parse(data);
             if(config.testingData){
-                console.log('To print:');
+                console.log('To handle:');
                 console.log(jsonData);
             }
-            //we search to update or create as new.
-            // TODO
-            //adding createdAt
-            jsonData.createdAt = jsonData.updatedAt;
-            Portfolio.create(jsonData,function(err, portfolio){
-                if(err){
-                    console.log('Error trying to add new portfolio on DB!',err);
-                    return res.status(500).send({message: 'Error trying to add portfolio', error: err});
+            Portfolio.findOneAndUpdate({ username: decoded.usernameHive }, jsonData, { new: true }, function(found,err){
+                if(err) return res.status(500).send({error: err});
+                if(found){ //it returns the update applied
+                    if(config.testingData){ console.log('Portfolio updated',found);}
+                    res.status(200).send({ status:'updated',result: found}); 
+                }else{ //we must create it
+                    Portfolio.create(jsonData,function(err, portfolio){
+                        if(err){
+                            console.log('Error trying to add new portfolio on DB!',err);
+                            return res.status(500).send({error: err});
+                        }
+                        if(portfolio){
+                            res.status(200).send({ status:'created',result: portfolio});
+                            if(config.testingData){
+                                console.log(`Created Portfolio on DB. \nname:${decoded.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
+                            }
+                        } 
+                    });
                 }
-                if(portfolio){
-                    res.status(200).send(portfolio);
-                    if(config.testingData){
-                        console.log(`Created Portfolio on DB. \nname:${decoded.usernameHive} \nId:${portfolio._id} \nTime:${time}`);
-                    }
-                } 
             });
         }else{
             return res.status(500).send({ auth: false, message: 'Error authenticating token GET Portfolio.' });

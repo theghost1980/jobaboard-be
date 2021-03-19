@@ -5,7 +5,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
-var Jobs = require('./Job');
+var Job = require('./Job');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();

@@ -126,9 +126,10 @@ router.post('/checkUser',function(req, res){
 router.post('/checkGatsbySig', async function(req, res){
     //dummy image if user not have profileImg set
     var profile_PicURL = "https://res.cloudinary.com/dbcugb6j4/image/upload/v1614450740/dummy-profilePic_ogyaoc.png";
-
+    const ts = req.headers['ts'];
     if(config.testingData === 'true'){
         console.log('A request AUTH/keychain has been made! -testing mode-');
+        console.log(`ts:${ts}`);
     }
     var userT = 'user';
     var banned = false;

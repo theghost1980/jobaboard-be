@@ -146,6 +146,8 @@ router.post('/checkGatsbySig', async function(req, res){
     //     return res.status(500).send({ auth: false, message: 'Signature provided wrong format!!!.' });
     // }
     // end old way
+    //to do a try-catch that handle if this is a valid sig or somehow check if valid before getting into this point
+    // const dataRemote = Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
     //NEW WAY testing today 19/03/2021
     const { signature, account } = req.body;
     try {
@@ -156,10 +158,9 @@ router.post('/checkGatsbySig', async function(req, res){
         return res.status(500).send({ auth: false, message: 'Signature provided wrong format!!!.' });
     }
     // end new way
-    // ----------------------editing, testing to remove-------------------------
-
     //to do a try-catch that handle if this is a valid sig or somehow check if valid before getting into this point
-    const dataRemote = Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
+    const dataRemote = Signature.fromString(signature).recover(cryptoUtils.sha256(ts)).toString();
+    // ----------------------editing, testing to remove-------------------------
     if(config.testingData){ console.log(`Dataremote: ${dataRemote}`); }
     client.database.getAccounts([`${account}`])
     .then(results => {

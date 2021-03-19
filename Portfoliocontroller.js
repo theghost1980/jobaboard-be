@@ -96,7 +96,7 @@ router.post('/createUpdate', function(req, res){
 /////////////////////////
 /////Public routes
 router.get('/queryUser',function(req,res){
-    console.log(req.headers);
+    // console.log(req.headers);
     const username = req.headers['username'];
     if(username === ""){
         res.status(404).send({ status: 'failed', result: 'I cannot query empty. JAB.'});

@@ -367,6 +367,8 @@ router.get('/logs', function(req, res){
 ///////////////////////////////////////////////////////////////////////
 //////Public routes for user
 router.get('/getField', function(req, res){
+    if(config.testingData){ console.log(req.headers)};
+    
     const query = req.headers['query'];
     const jsonFields = JSON.parse(query);
     if(config.testingData){ console.log('To find:', jsonFields)};
@@ -384,7 +386,7 @@ router.get('/getField', function(req, res){
         });
     }
 })
-//////En Public
+//////END Public
 ///////////////////////////////////////////////////////////////////////
 
 // get a single user from DB

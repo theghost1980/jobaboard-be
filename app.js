@@ -15,6 +15,7 @@ if(config.testingData === 'true'){
     console.log(`Job Access:${config.jobEP}`);
     console.log(`NFT Access:${config.nft_EP}`);
     console.log(`Portfolio Access:${config.portfolioEP}`);
+    console.log(`Public Access:${config.publicEP}`);
 }
 var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
@@ -45,6 +46,10 @@ app.use(config.portfolioEP,PortfolioController);
 // testing SSC 
 var SSCController = require('./TestSSC');
 app.use(config.nft_EP, SSCController);
+
+//adding public routes
+var PublicController = require('./Publiccontroller');
+app.use(config.publicEP, PublicController);
 
 module.exports = app;
 

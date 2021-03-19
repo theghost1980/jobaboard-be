@@ -134,17 +134,33 @@ router.post('/checkGatsbySig', async function(req, res){
     var userT = 'user';
     var banned = false;
     const time = new Date();
+
+    // ----------------------editing, testing to remove-------------------------
+    //OLD WAY without using the ts
+    // const { signature, account } = req.body;
+    // try {
+    //     Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
+    // } catch (error) {
+    //     //possible the signature do not have same lenght/corrupted/wrong data
+    //     console.log(error);
+    //     return res.status(500).send({ auth: false, message: 'Signature provided wrong format!!!.' });
+    // }
+    // end old way
+    //NEW WAY testing today 19/03/2021
     const { signature, account } = req.body;
     try {
-        Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
+        Signature.fromString(signature).recover(cryptoUtils.sha256(ts)).toString();
     } catch (error) {
         //possible the signature do not have same lenght/corrupted/wrong data
         console.log(error);
         return res.status(500).send({ auth: false, message: 'Signature provided wrong format!!!.' });
     }
+    // end new way
+    // ----------------------editing, testing to remove-------------------------
+
     //to do a try-catch that handle if this is a valid sig or somehow check if valid before getting into this point
     const dataRemote = Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
-    // console.log(`Dataremote: ${dataRemote}`);
+    if(config.testingData){ console.log(`Dataremote: ${dataRemote}`); }
     client.database.getAccounts([`${account}`])
     .then(results => {
         // console.log(`Found: ${results.length}`);
@@ -160,13 +176,13 @@ router.post('/checkGatsbySig', async function(req, res){
                 //one case to test if the profile is brand new it wont have profile image
                 // console.log(results[0]);
                 //if the account is brandnew .posting_json_metadata = '' so let's verify that first
-                console.log(results[0]);
+                if(config.testingData){ console.log(results[0]); }
                 //now I should check if there is any profile pic on user.s hive profile
                 try {
                     //try to parse the posting_json_metadata if error then is brand new or not image set
                     //the account has been used to it may have profile picture already set
                     const JSON_metadata = JSON.parse(results[0].posting_json_metadata);
-                    console.log(JSON_metadata);
+                    if(config.testingData){ console.log(JSON_metadata); }
                     if(JSON_metadata.profile.profile_image){
                         profile_PicURL = JSON_metadata.profile.profile_image;
                         }

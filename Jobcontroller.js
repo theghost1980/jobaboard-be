@@ -140,7 +140,7 @@ router.get('/publicAllJobs',function(req,res){
         if(err) {console.log('Error finding jobs',err)}
         if(!jobs) return res.status(200).send({ result: []});
         if(jobs) return res.status(200).send({ result: jobs});
-    }).sort( { createdAt: 1 })
+    }).sort( { createdAt: -1 })
     if(config.testingData){
         console.log('Public request made asking for ALL JOBS');
         console.log(time);

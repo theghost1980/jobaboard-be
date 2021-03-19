@@ -19,7 +19,7 @@ router.get('/getField', function(req, res){
         if(config.testingData){console.log('Empty query from public users req');}
         return res.status(404).send({ status: 'failed', message: 'I cannot query emptiness.'});
     }else{
-        User.find({ username: query.username }, { avatar: 1 },function(err,found){
+        User.findOne({ username: query.username },function(err,found){
             if(err){
                 if(config.testingData){ console.log('Error getting field from user, public request.',err)};
                 return res.status(500).send({ error: err });

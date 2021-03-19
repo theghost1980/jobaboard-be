@@ -133,13 +133,14 @@ router.get('/myjoblist',function(req,res){
 // TODO: set this a a public router just to handle all the OPEN queries.
 ////PUBLIC ROUTES....
 //get all job PUBLIC query
+// TODO add the sort option as asc = 1 || desc = -1 + field to sortBy.
 router.get('/publicAllJobs',function(req,res){
     const time = new Date();
     Job.find({ active: true }, function(err, jobs){
         if(err) {console.log('Error finding jobs',err)}
         if(!jobs) return res.status(200).send({ result: []});
         if(jobs) return res.status(200).send({ result: jobs});
-    })
+    }).sort( { createdAt: 1 })
     if(config.testingData){
         console.log('Public request made asking for ALL JOBS');
         console.log(time);

@@ -12,8 +12,6 @@ const time = new Date();
 ///////////////////////////////////////////////////////////////////////
 //////Public routes for user
 router.get('/getField', function(req, res){
-    if(config.testingData){ console.log(req.headers)};
-    
     const query = req.headers['query'];
     const jsonFields = JSON.parse(query);
     if(config.testingData){ console.log('To find:', jsonFields)};
@@ -21,7 +19,7 @@ router.get('/getField', function(req, res){
         if(config.testingData){console.log('Empty query from public users req');}
         return res.status(404).send({ status: 'failed', message: 'I cannot query emptiness.'});
     }else{
-        User.find(query.username,query.fields,function(err,found){
+        User.find({ username: query.username },query.fields,function(err,found){
             if(err){
                 if(config.testingData){ console.log('Error getting field from user, public request.',err)};
                 return res.status(500).send({ error: err });

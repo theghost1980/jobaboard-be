@@ -60,7 +60,8 @@ router.post('/createJob', async function(req,res){
             // then search for this user jobs by the title comming. req.headers['title']
             const title = req.headers['title'];
             console.log(`trying to find:${title}`);
-            Job.findOne({ title: title },function(err,found){
+            //so we search to be sure than this user has no other job with same title.
+            Job.findOne({ title: title, username: decoded.usernameHive },function(err,found){
                 if(err){ //return res.status(500).send({ 'status': 'failed request -job Search', 'error': err });
                     console.log('Error on search.',err);
                 }

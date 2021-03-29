@@ -7,11 +7,11 @@ var JobSchema = new mongoose.Schema({
     },
     category: String,
     sub_category: String,
-    title: { //so we can search using id or title.
+    title: {
         type: String,
         required: true,
-        unique: true,
     },
+    job_type: String, //defines if employee || employer
     description: String,
     images: [String], //as support if the job needs it.
     nft_symbol: String,

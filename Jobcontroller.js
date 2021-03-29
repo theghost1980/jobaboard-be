@@ -150,7 +150,7 @@ router.get('/publicAllJobs',function(req,res){
 router.get('/publicAllJobsQuery',function(req,res){
     const time = new Date();
     const query = JSON.parse(req.headers['query']);
-    const limit = req.headers['limit'] || 0; //just in case no number comes from request.
+    const limit = Number(req.headers['limit']) || 0; //just in case no number comes from request.
     if(config.testingData){
         console.log('query to find on all jobs:');
         console.log(query);

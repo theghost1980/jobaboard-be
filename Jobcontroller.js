@@ -154,7 +154,7 @@ router.get('/publicAllJobsQuery',function(req,res){
         console.log('query to find on all jobs:');
         console.log(query);
     }
-    Job.find({ query }, function(err, jobs){
+    Job.find({ ...query }, function(err, jobs){
         if(err) {console.log('Error finding jobs',err)}
         if(!jobs) return res.status(200).send({ result: []});
         if(jobs) return res.status(200).send({ result: jobs});

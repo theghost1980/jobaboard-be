@@ -43,7 +43,7 @@ router.post('/createNFT', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //search nfts first on hive
-            Nft.find({ nft_id: id},function(err,token){
+            Nft.findOne({ nft_id: id},function(err,token){
                 if(err){
                     if(config.testingData){
                         console.log('Error finding Nft',err);

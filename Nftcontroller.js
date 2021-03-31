@@ -43,34 +43,38 @@ router.post('/createNFT', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //search nfts first on hive
-            Nft.findOne({ nft_id: id},function(err,token){
-                if(err){
-                    if(config.testingData){
-                        console.log('Error finding Nft',err);
-                    }
-                    res.status(500).send({ error: 'Error searching for Nft', message: err});
-                }
-                if(token){
-                    //send error message to user
-                    res.status(404).send({ status: 'found', message: `This token's symbol is been taken at:${token.createdAt}, please choose another one.`})
-                }else{
-                    //let's create it
-                    if(config.testingData){
-                        console.log('Creting nft:::');
-                        console.log(req.body);
-                    }
-                    Nft.create(req.body,function(err,_nft){
-                        if(err){
-                            if(config.testingData){
-                                console.log('Error creating Nft',err);
-                            }
-                            res.status(500).send({ error: 'Error creating the Nft', message: err});
-                        }
-                        if(config.testingData){ console.log(`Nft created for:${_nft.account} at:${_nft.createdAt}`)}
-                        res.status(200).send({ status: 'success', result: _nft});
-                    });
-                }
-            });
+
+            var data = {};
+            data = req.body;
+            console.log('To save:::',id);
+            console.log(data);
+            // Nft.findOne({ nft_id: id},function(err,token){
+            //     if(err){
+            //         if(config.testingData){
+            //             console.log('Error finding Nft',err);
+            //         }
+            //         res.status(500).send({ error: 'Error searching for Nft', message: err});
+            //     }
+            //     if(token){
+            //         //send error message to user
+            //         res.status(404).send({ status: 'found', message: `This token's symbol is been taken at:${token.createdAt}, please choose another one.`})
+            //     }else{
+            //         //let's create it
+            //         if(config.testingData){
+            //             console.log('Creating nft:::');
+            //         }
+            //         Nft.create(req.body,function(err,_nft){
+            //             if(err){
+            //                 if(config.testingData){
+            //                     console.log('Error creating Nft',err);
+            //                 }
+            //                 res.status(500).send({ error: 'Error creating the Nft', message: err});
+            //             }
+            //             if(config.testingData){ console.log(`Nft created for:${_nft.account} at:${_nft.createdAt}`)}
+            //             res.status(200).send({ status: 'success', result: _nft});
+            //         });
+            //     }
+            // });
         }else{
             res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
         }

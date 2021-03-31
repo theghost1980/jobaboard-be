@@ -12,6 +12,9 @@ const time = new Date();
 const SSC = require('sscjs');
 const ssc = new SSC(config.SSC_node);
 
+// TODO very important:
+// fix the vulnerability of axios on sscjs
+
 //get all NFTs, with a query.
 // may be: { issuer: acc } or a more complex query
 // as { issuer: acc, "properties.isPremium.authorizedEditingAccounts": acc }

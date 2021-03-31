@@ -16,4 +16,7 @@ module.exports = {
     'SSC_node': process.env.ssc_node,
     'portfolioEP': process.env.portfolio_EP,
     'publicEP': process.env.public_EP,
+    'logoDefault':process.env.nftDefaultLogo,
+    'miniLogoDefault':process.env.nftDefaultMiniLogo,
+    'handleNFTEP': process.env.handleNFT_EP,
 }

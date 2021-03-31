@@ -13,7 +13,8 @@ if(config.testingData === 'true'){
     console.log(`User Access:${config.userEP}`);
     console.log(`Admin Access:${config.adminEP}`);
     console.log(`Job Access:${config.jobEP}`);
-    console.log(`NFT Access:${config.nft_EP}`);
+    console.log(`NFT operations on HIVE chain - Access:${config.nft_EP}`);
+    console.log(`NFT mongoDB access:${config.handleNFTEP}`);
     console.log(`Portfolio Access:${config.portfolioEP}`);
     console.log(`Public Access:${config.publicEP}`);
 }
@@ -50,6 +51,10 @@ app.use(config.nft_EP, SSCController);
 //adding public routes
 var PublicController = require('./Publiccontroller');
 app.use(config.publicEP, PublicController);
+
+//NFT handling on MongoDB
+var NFTController = require('./Nftcontroller');
+app.use(config.handleNFTEP, NFTController);
 
 module.exports = app;
 

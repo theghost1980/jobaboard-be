@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
-router.use(bodyParser.json());
+// router.use(bodyParser.json());
 var Nft = require('./Nft');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
@@ -44,7 +44,9 @@ router.post('/createNFT', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //search nfts first on hive
-
+            const data = JSON.stringify(req.body);
+            console.log('Data Received');
+            console.log(data);
             Nft.findOne({ nft_id: id},function(err,token){
                 if(err){
                     if(config.testingData){

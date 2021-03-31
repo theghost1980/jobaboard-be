@@ -70,10 +70,10 @@ router.post('/addOp',function(req, res){
                         return res.status(500).send({ error: 1, message: 'Failed to add new log on Event'})
                     }
                     if(logOP){ 
-                        if(config.testingData){
-                            console.log(`Request by system to add OP made:${time}`);
-                            console.log(`logID:${logOP.id} created.`);
-                        }
+                        // if(config.testingData){
+                        //     console.log(`Request by system to add OP made:${time}`);
+                        //     console.log(`logID:${logOP.id} created.`);
+                        // }
                         return res.status(200).send({ result: "Sucess!", logID: logOP.id});
                     }
                 }

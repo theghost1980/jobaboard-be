@@ -45,7 +45,7 @@ router.post('/createNFT', function(req,res){
         if(decoded){
             //search nfts first on hive
 
-            Nft.findOne({ nft_id: Number(id)},function(err,token){
+            Nft.findOne({ nft_id: id},function(err,token){
                 if(err){
                     if(config.testingData){
                         console.log('Error finding Nft',err);

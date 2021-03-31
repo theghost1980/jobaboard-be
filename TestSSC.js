@@ -40,7 +40,7 @@ router.get('/allNFTs', function(req, res){
                     if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
                     return res.status(500).send({ result: 'error', error: err});
                 }
-                if(config.testingData){console.log(result);}
+                // if(config.testingData){console.log(result);}
                 res.status(200).send(result);
             });
         }
@@ -63,18 +63,18 @@ router.get('/allInstances', function(req, res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            if(config.testingData){
-                console.log(`Requested instances,user:${decoded.usernameHive}`)
-                console.log(_query);
-                console.log(nftSymbol);
-                console.log(table);
-            }
+            // if(config.testingData){
+            //     console.log(`Requested instances,user:${decoded.usernameHive}`)
+            //     console.log(_query);
+            //     console.log(nftSymbol);
+            //     console.log(table);
+            // }
             ssc.find("nft", `${nftSymbol}${table}`, _query, null, 0, [], (err, result) => {
                 if(err){
-                    if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+                    // if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
                     return res.status(500).send({ result: 'error', error: err});
                 }
-                if(config.testingData){console.log(result);}
+                // if(config.testingData){console.log(result);}
                 res.status(200).send(result);
             });
         }
@@ -91,16 +91,16 @@ router.get('/getBalance', function(req, res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            if(config.testingData){
-                console.log(`Requested instances,user:${decoded.usernameHive}`)
-                console.log(_query);
-            }
+            // if(config.testingData){
+            //     console.log(`Requested instances,user:${decoded.usernameHive}`)
+            //     console.log(_query);
+            // }
             ssc.find("tokens", "balances", _query, null, 0, [], (err, result) => {
                 if(err){
-                    if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+                    // if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
                     return res.status(500).send({ result: 'error', error: err});
                 }
-                if(config.testingData){console.log(result);}
+                // if(config.testingData){console.log(result);}
                 res.status(200).send(result);
             });
         }

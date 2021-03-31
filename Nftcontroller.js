@@ -54,7 +54,11 @@ router.post('/createNFT', function(req,res){
                     res.status(404).send({ status: 'found', message: `This token's symbol is been taken at:${token.createdAt}, please choose another one.`})
                 }else{
                     //let's create it
-                    Nft.create(req.data,function(err,_nft){
+                    if(config.testingData){
+                        console.log('Creting nft:::');
+                        console.log(req.body);
+                    }
+                    Nft.create(req.body,function(err,_nft){
                         if(err){
                             if(config.testingData){
                                 console.log('Error creating Nft',err);

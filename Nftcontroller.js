@@ -37,6 +37,7 @@ const time = new Date();
 // the images will be handled only if the user wants to update the NFT info.
 router.post('/createNFT', function(req,res){
     const token = req.headers['x-access-token'];
+    const id = req.headers['id'];
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });

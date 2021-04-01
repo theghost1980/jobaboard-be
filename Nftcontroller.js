@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: false }));
+// router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 var Nft = require('./Nft');
 var jwt = require('jsonwebtoken');
@@ -33,7 +33,10 @@ const time = new Date();
 
 // todo: erase this testings
 // testing route while practicing on handling data
-router.post('/testData', function(req, res){
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+router.post('/testData', urlencodedParser, function(req, res){
     console.log('Incomming Req.body');
     const data = req.body;
     Object.entries(data).forEach(([key, val]) => {

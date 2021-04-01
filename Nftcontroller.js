@@ -34,8 +34,8 @@ const time = new Date();
 // todo: erase this testings
 // testing route while practicing on handling data
 router.post('/testData', function(req, res){
-    console.log('Incomming Req');
-    console.log(req);
+    console.log('Incomming Req.body');
+    console.log(req.body);
     res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
 });
 // end testing

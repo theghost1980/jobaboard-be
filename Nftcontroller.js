@@ -35,7 +35,11 @@ const time = new Date();
 // testing route while practicing on handling data
 router.post('/testData', function(req, res){
     console.log('Incomming Req.body');
-    console.log(req.body);
+    const data = req.body;
+    Object.entries(data).forEach(([key, val]) => {
+        console.log(`Field:${key},value:${val},typeOf:${typeof val}`);
+    });
+    console.log(data);
     res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
 });
 // end testing

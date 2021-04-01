@@ -43,6 +43,8 @@ router.post('/testData', urlencodedParser, function(req, res){
         console.log(`Field:${key},value:${val},typeOf:${typeof val}`);
     });
     console.log(data);
+    const formData = req.Form["test1"];
+    console.log(formData);
     res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
 });
 // end testing

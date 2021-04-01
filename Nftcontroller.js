@@ -39,10 +39,14 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 router.post('/testData', urlencodedParser, function(req, res){
     console.log('Incomming Req.body');
     const data = req.body;
+    console.log('Data Stringified:::');
+    console.log(JSON.stringify(data));
+    console.log('As it comes:::');
+    console.log(data);
+    console.log('Now escaning each key,val & typeof::::');
     Object.entries(data).forEach(([key, val]) => {
         console.log(`Field:${key},value:${val},typeOf:${typeof val}`);
     });
-    console.log(data);
     res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
 });
 // end testing

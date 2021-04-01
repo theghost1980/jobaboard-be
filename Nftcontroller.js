@@ -34,7 +34,7 @@ const time = new Date();
 // todo: erase this testings
 // testing route while practicing on handling data
 // create application/x-www-form-urlencoded parser
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+var urlencodedParser = bodyParser.urlencoded({ extended: true });
 
 router.post('/testData', urlencodedParser, function(req, res){
     console.log('Incomming Req.body');
@@ -43,8 +43,6 @@ router.post('/testData', urlencodedParser, function(req, res){
         console.log(`Field:${key},value:${val},typeOf:${typeof val}`);
     });
     console.log(data);
-    const formData = req.Form["test1"];
-    console.log(formData);
     res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
 });
 // end testing

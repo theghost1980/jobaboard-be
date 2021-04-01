@@ -31,6 +31,15 @@ const time = new Date();
 
 // TODO a find router just to prevent or lock or whatever  we may need in future.
 
+// todo: erase this testings
+// testing route while practicing on handling data
+router.post('/testData', function(req, res){
+    console.log('Incomming Req');
+    console.log(req);
+    res.status(200).send({ status: 'success', message: 'Req received. Kee the hard & good work'});
+});
+// end testing
+
 //  Create NFt for user.
 // as names are uniques no need to check if user already created it.
 // on creation we will use the data, no need for image

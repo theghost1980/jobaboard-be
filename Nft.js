@@ -38,6 +38,10 @@ var NFTSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    in_use: { //i think we may need this field as true, when in use in a job, escrow so user cannot edit price i.e
+        type: Boolean,
+        default: false,
+    },
     burned: {
         type: Boolean,
         default: false,

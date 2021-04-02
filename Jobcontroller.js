@@ -10,7 +10,7 @@ const time = new Date();
 
 //+++++++++++++++++++++++++++++++++++++++++++++++
 ///////////////////////////////////////////////////////////////////////////////
-//////////Whole process to upload an image from client/////////////////////////
+//////////Whole process to upload image(s) from client/////////////////////////
 //declarations
 //cloudinary CDN images
 var cloudinary = require('cloudinary').v2;

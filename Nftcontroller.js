@@ -182,6 +182,7 @@ router.get('/getNFTquery', function(req,res){
     const token = req.headers['x-access-token'];
     const query = req.headers['query'];
     const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -204,6 +205,7 @@ router.get('/getNFTquery', function(req,res){
             });
             console.log('New query to process::::');
             console.log(newNode, `Limit:${limit}`);
+            console.log('Sortby:',sortby);
             Nft.find(newNode,function(err,tokens){
                 if(err){
                     if(config.testingData){
@@ -212,7 +214,7 @@ router.get('/getNFTquery', function(req,res){
                     return res.status(500).send({ error: 'Error searching for Nft', message: err});
                 }
                 return res.status(200).send({ status: 'sucess', result: tokens });
-            }).limit(limit);
+            }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
 
         }else{
             res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});

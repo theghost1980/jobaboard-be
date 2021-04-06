@@ -32,6 +32,10 @@ var NFTSchema = new mongoose.Schema({
     maxSupply: String, //but handled as a number
     authorizedIssuingAccounts: [String],
     issuer: String,
+    issued_On:{ //this field may help to identify if the token was created on JAB or somewhere else, as a future feature if a user uses another platform to create an nft, he may be allowed to use it on jab only if pays a fee.
+        type: String,
+        default:"JAB platform",
+    },
     supply: Number,
     circulatingSupply: Number,
     for_sale: {

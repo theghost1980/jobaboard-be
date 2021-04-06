@@ -8,7 +8,7 @@ var Logs = require('./Logs');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
-
+const axios = require('axios');
 const SSC = require('sscjs');
 const ssc = new SSC(config.SSC_node);
 
@@ -19,7 +19,7 @@ const ssc = new SSC(config.SSC_node);
 // may be: { issuer: acc } or a more complex query
 // as { issuer: acc, "properties.isPremium.authorizedEditingAccounts": acc }
 router.get('/allNFTs', function(req, res){
-    // console.log(req.params);
+    // console.log(req);
     // if(checkId(req.params.id.toString())){
     ////////////
     //check for a valid token
@@ -35,7 +35,8 @@ router.get('/allNFTs', function(req, res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //test to make a query to the test node.
-            ssc.find("nft", "nfts", _query, null, 0, [], (err, result) => {
+            ssc.find("nft", "nfts", _query, null, 0, [{ index: "symbol", descending: false }], (err, result) => {
+                if(result === null){ return res.status(200).send({ status: 'askAgain'})}
                 if(err){
                     if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
                     return res.status(500).send({ result: 'error', error: err});
@@ -81,6 +82,31 @@ router.get('/allInstances', function(req, res){
     });
 });
 
+//to handle tx
+router.get('/tx', function(req, res){
+    //testing to look up a particular tx on the test SSC server
+    const tx = req.headers['tx'];
+    const token = req.headers['x-access-token'];
+
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            console.log(`Look into tx:${tx}`);
+            console.log(`From:${decoded.usernameHive}`);
+            ssc.getTransactionInfo(tx, function(err, result){
+                if(result === null){ return res.status(200).send({ status: 'askAgain'})}
+                if(err){
+                    if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+                    return res.status(500).send({ result: 'error', error: err});
+                }
+                // if(config.testingData){console.log(result);}
+                res.status(200).send(result);
+            });
+        }
+    });
+});
+
 //get a token balance inside the RPC node
 router.get('/getBalance', function(req, res){
     const token = req.headers['x-access-token'];
@@ -98,6 +124,35 @@ router.get('/getBalance', function(req, res){
             ssc.find("tokens", "balances", _query, null, 0, [], (err, result) => {
                 if(err){
                     // if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+                    return res.status(500).send({ result: 'error', error: err});
+                }
+                // if(config.testingData){console.log(result);}
+                res.status(200).send(result);
+            });
+        }
+    });
+});
+
+//the next route must return the token if created
+router.get('/findNFT', function(req, res){
+    // console.log(req);
+    // if(checkId(req.params.id.toString())){
+    ////////////
+    //check for a valid token
+    const token = req.headers['x-access-token'];
+    const query = req.headers['query']; //format as JSON.stringify(query = {});
+    // TODO: this parsing has to be inside try/catch and it will serve as another checks on data
+    const _query = JSON.parse(query);
+    if(config.testingData){ console.log(_query); }
+    // console.log('Token', token);
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            //test to make a query to the test node.
+            ssc.find("nft", "nfts", _query, null, 0, [{ index: "symbol", descending: false }], (err, result) => {
+                if(err){
+                    if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
                     return res.status(500).send({ result: 'error', error: err});
                 }
                 // if(config.testingData){console.log(result);}

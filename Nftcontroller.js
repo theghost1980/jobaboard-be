@@ -177,6 +177,36 @@ router.post('/addNFTDB', function(req, res){
 
 // end testing
 
+// update NFT. first udpate just 1 field as we will need this to update a particualr field, i.e: just the supply, burned, updatedAt, etc.
+router.post('updateNFTfield', function(req,res){
+    const token = req.headers['x-access-token'];
+    const nft_id = req.headers['nft_id'];
+    const query = req.headers['query'];
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty query has been made!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }else{
+        console.log('To modify fields:');
+        console.log(jsonQuery);
+    };
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            Nft.findOneAndUpdate({ nft_id: nft_id, account: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
+                if(err){
+                    console.log('Error trying to update the Nft',err);
+                    return res.status(500).send({ status: 'failed', error: err});
+                }
+                res.status(200).send({ status: 'sucess', result: updated});
+            });
+        }else{
+            res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        }
+    });
+});
+
 //get all token based on query, handling the query on headers.
 router.get('/getNFTquery', function(req,res){
     const token = req.headers['x-access-token'];

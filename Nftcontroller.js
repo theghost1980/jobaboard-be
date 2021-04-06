@@ -178,7 +178,7 @@ router.post('/addNFTDB', function(req, res){
 // end testing
 
 // update NFT. first udpate just 1 field as we will need this to update a particualr field, i.e: just the supply, burned, updatedAt, etc.
-router.post('updateNFTfield', function(req,res){
+router.post('/updateNFTfield', function(req,res){
     const token = req.headers['x-access-token'];
     const nft_id = req.headers['nft_id'];
     const query = req.headers['query'];

@@ -11,9 +11,7 @@ var UserSchema = new mongoose.Schema({
         default: false,
     },
     ban_reason: String,
-    following: { //The users this user is following INSIDE JAB. We do not handle or care about HIVE followers as that's a waste of time and data for JAB.
-        type: Array,
-    },
+    following: [String], //The users this user is following INSIDE JAB. We do not handle or care about HIVE followers as that's a waste of time and data for JAB.
     fullname: String,
     bio: String,
     location: String,

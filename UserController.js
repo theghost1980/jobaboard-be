@@ -117,6 +117,30 @@ router.get('/jabUserField', function(req,res){
     });
 });
 
+// Update field(s) on user
+router.post('/updateUserField', function(req,res){
+    const token = req.headers['x-access-token'];
+    const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: value} i.e { following: ['user1','user2'], ... }
+    // TODO validate in case of empty query -> return 404 Funny message.
+
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            console.log('To Update field(s):',jsonQuery);
+            User.findOneAndUpdate( { username: decoded.usernameHive }, jsonQuery, { new: true }, function(err, updated){
+                if(err){
+                    console.log('Error on mongoDB field update.',err);
+                    return res.status(500).send({ status: 'error', error: err});
+                }
+                res.status(200).send({ status: 'sucess', result: updated});
+            });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Error on mongoDB field(s) update.' });
+        }
+    });
+});
+
 /////////////////////////
 //Final routers for USERS
 //Get user by username

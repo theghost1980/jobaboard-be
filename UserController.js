@@ -127,7 +127,6 @@ router.post('/updateUserField', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             console.log('To Update field(s):',jsonQuery);
-            console.log('Applying field filters:',objFilter);
             User.findOneAndUpdate( { username: decoded.usernameHive }, jsonQuery, { new: true }, function(err, updated){
                 if(err){
                     console.log('Error on mongoDB field update.',err);

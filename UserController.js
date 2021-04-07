@@ -98,7 +98,7 @@ router.get('/jabUserField', function(req,res){
     const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: "fieldToGet"}
     // TODO validate in case of empty query -> return 404 Funny message.
-    console.log('Querying on field.', query);
+    console.log('Querying on field.', jsonQuery);
     //{ item: 1, fieldToGet: 1 }
     const newNode = {};
     Object.entries(jsonQuery).forEach(([key, val]) => {

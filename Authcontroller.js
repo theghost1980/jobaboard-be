@@ -175,7 +175,8 @@ router.post('/checkGatsbySig', async function(req, res){
             if(key){
                 // as founded send user's profile pic from hive just in case there is none in mongoDB
                 //one case to test if the profile is brand new it wont have profile image
-                // console.log(results[0]);
+                console.log('Actual Profile Found from HIVE chain::::');
+                console.log(results[0]);
                 //if the account is brandnew .posting_json_metadata = '' so let's verify that first
                 if(config.testingData){ console.log(results[0]); }
                 //now I should check if there is any profile pic on user.s hive profile

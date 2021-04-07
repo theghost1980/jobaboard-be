@@ -11,7 +11,7 @@ var UserSchema = new mongoose.Schema({
         default: false,
     },
     ban_reason: String,
-    following: {
+    following: { //TODO, find a way to add this info from hive on account's creation.
         type: Array,
     },
     fullname: String,

@@ -109,6 +109,7 @@ router.get('/jabUserField', function(req,res){
                     console.log('Error on mongoDB query.',err);
                     return res.status(500).send({ status: 'error', error: err});
                 }
+                console.log("Found:",found);
                 res.status(200).send({ status: 'sucess', result: found});
             });
         }else{

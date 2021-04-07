@@ -11,7 +11,7 @@ var UserSchema = new mongoose.Schema({
         default: false,
     },
     ban_reason: String,
-    following: { //TODO, find a way to add this info from hive on account's creation.
+    following: { //The users this user is following INSIDE JAB. We do not handle or care about HIVE followers as that's a waste of time and data for JAB.
         type: Array,
     },
     fullname: String,

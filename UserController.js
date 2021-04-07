@@ -92,6 +92,37 @@ router.post('/saveImage', function (req, res) {
 ///////////////////////////////////////////////////////////////////////////////
 //+++++++++++++++++++++++++++++++++++++++++++++++
 
+// Methods to handle following field [String]
+// 1. Get following data from a user. but it serves at get a field from user.
+router.get('/jabUserField', function(req,res){
+    const token = req.headers['x-access-token'];
+    const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: "fieldToGet"}
+    // TODO validate in case of empty query -> return 404 Funny message.
+    console.log('Querying on field.', query);
+    //{ item: 1, fieldToGet: 1 }
+    const newNode = {};
+    Object.entries(jsonQuery).forEach(([key, val]) => {
+        if(val !== null && val !== ""){
+            return (newNode[val] = 1);
+        }
+    });
+    console.log('To execute as projection field:',newNode);
+    const projection = { item: 1, newNode: newNode};
+    console.log('So the final project is:',projection);
+
+    // if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    // jwt.verify(token, config.secret, function(err, decoded){
+    //     if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    //     if(decoded){
+    //         User.findOne( { username: decoded.usernameHive }, { item: 1, field:1}, function(err, found){
+
+    //         });
+    //     }else{
+    //         return res.status(500).send({ auth: false, message: 'Error authenticating token PUT user.' });
+    //     }
+    // });
+});
+
 /////////////////////////
 //Final routers for USERS
 //Get user by username
@@ -261,37 +292,6 @@ router.put('/update/:username', function(req, res){
             return res.status(500).send({ auth: false, message: 'Error authenticating token PUT user.' });
         }
     });
-});
-
-// Methods to handle following field [String]
-// 1. Get following data from a user. but it serves at get a field from user.
-router.get('/jabUserField', function(req,res){
-    const token = req.headers['x-access-token'];
-    const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: "fieldToGet"}
-    // TODO validate in case of empty query -> return 404 Funny message.
-    console.log('Querying on field.', query);
-    //{ item: 1, fieldToGet: 1 }
-    const newNode = {};
-    Object.entries(jsonQuery).forEach(([key, val]) => {
-        if(val !== null && val !== ""){
-            return (newNode[val] = 1);
-        }
-    });
-    console.log('To execute as projection field:',newNode);
-    const projection = { item: 1, newNode: newNode};
-    console.log('So the final project is:',projection);
-
-    // if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
-    // jwt.verify(token, config.secret, function(err, decoded){
-    //     if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-    //     if(decoded){
-    //         User.findOne( { username: decoded.usernameHive }, { item: 1, field:1}, function(err, found){
-
-    //         });
-    //     }else{
-    //         return res.status(500).send({ auth: false, message: 'Error authenticating token PUT user.' });
-    //     }
-    // });
 });
 
 // router.post('/',function(req,res){

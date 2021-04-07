@@ -106,6 +106,10 @@ router.get('/queryUser',function(req,res){
                 if(config.testingData){ console.log('Error getting user portfolio from PUB-EP',err)};
                 return res.status(500).send({ status: 'error', result: err});
             }
+            if(!found){
+                console.log('That user do not have portfolio created yet.', username);
+                return res.status(404).send({ status: 'failed', message: 'User has no porfoltio yet'});
+            }
             if(config.testingData){ console.log('Public query portfolio made.',username)};
             return res.status(200).send(found); 
         });

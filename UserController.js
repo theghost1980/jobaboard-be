@@ -121,8 +121,6 @@ router.get('/jabUserField', function(req,res){
 router.post('/updateUserField', function(req,res){
     const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: value} i.e { following: ['user1','user2'], ... }
-    const filterFields = JSON.parse(req.headers['filterFields']);
-    const objFilter = Object.assign(filterFields, { new: true });
     // TODO validate in case of empty query -> return 404 Funny message.
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
@@ -130,7 +128,7 @@ router.post('/updateUserField', function(req,res){
         if(decoded){
             console.log('To Update field(s):',jsonQuery);
             console.log('Applying field filters:',objFilter);
-            User.findOneAndUpdate( { username: decoded.usernameHive }, jsonQuery, objFilter, function(err, updated){
+            User.findOneAndUpdate( { username: decoded.usernameHive }, jsonQuery, { new: true }, function(err, updated){
                 if(err){
                     console.log('Error on mongoDB field update.',err);
                     return res.status(500).send({ status: 'error', error: err});

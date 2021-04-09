@@ -6,9 +6,12 @@ const config = require('./config');
 //      if exists, return message to user as name taken, refresh nft names.
 // 2.   after created success, change state lwc. Done.
 var NFTSchema = new mongoose.Schema({
-    nft_id: {
+    nft_id: { 
         type: Number,
         unique: true,
+    },
+    id_ext: {
+        type: Number,
     },
     account: String, //actual owner of the token = nft = instance.
     image: {

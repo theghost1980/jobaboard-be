@@ -10,9 +10,7 @@ var NFTSchema = new mongoose.Schema({
         type: Number,
         unique: true,
     },
-    id_ext: {
-        type: Number,
-    },
+    id_ext: Number,
     account: String, //actual owner of the token = nft = instance.
     image: {
         type: String,

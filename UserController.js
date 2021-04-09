@@ -92,6 +92,34 @@ router.post('/saveImage', function (req, res) {
 ///////////////////////////////////////////////////////////////////////////////
 //+++++++++++++++++++++++++++++++++++++++++++++++
 
+//method to find for a user but when you are logged
+router.get('/findJabUser', function(req,res){
+    const token = req.headers['x-access-token'];
+    const jsonQuery = JSON.parse(req.headers['query']); // the search query as we define it from client i.e { field: 'value',... }
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            console.log('Loof up for User based on Query:',jsonQuery);
+            User.findOne( jsonQuery, function(err, found){
+                if(err){
+                    console.log('Error on mongoDB query.',err);
+                    return res.status(500).send({ status: 'error', error: err});
+                }
+                if(found){
+                    console.log("Found:",found);
+                    res.status(200).send({ status: 'sucess', result: found});
+                }else{
+                    console.log("Not Found!");
+                    res.status(200).send({ status: 'not found', result: found});
+                }
+            });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Error authenticating token user getUserField.' });
+        }
+    });
+});
+
 // Methods to handle following field [String]
 // 1. Get following data from a user. but it serves at get a field from user.
 router.get('/jabUserField', function(req,res){

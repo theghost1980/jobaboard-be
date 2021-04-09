@@ -161,7 +161,7 @@ router.post('/addNFTDB', function(req, res){
             data.image = image;
             data.thumb = thumb;
         }
-        data.authorizedIssuingAccounts = JSON.parse(data.authorizedIssuingAccounts);
+        // data.authorizedIssuingAccounts = JSON.parse(data.authorizedIssuingAccounts);
         console.log("We're about to save::::");
         console.log(data);
         Nft.create(data, function(err,newNft){

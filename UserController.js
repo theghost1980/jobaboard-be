@@ -161,6 +161,7 @@ router.post('/updateUserField', function(req,res){
                     console.log('Error on mongoDB field update.',err);
                     return res.status(500).send({ status: 'error', error: err});
                 }
+                console.log('Updated as:',updated);
                 res.status(200).send({ status: 'sucess', result: updated});
             });
         }else{

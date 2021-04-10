@@ -29,7 +29,9 @@ var UserSchema = new mongoose.Schema({
     __v: { type: Number, select: false },
     createdAt: Date,
     updatedAt: Date,
-    holding: [String], //this i think is the best way to relate the instances each user has. i.e: AKA,TOK,COKE. Means this user has instances of those 3 symbol tokens.
+    holding: {
+        type: [String],
+    }, //this i think is the best way to relate the instances each user has. i.e: AKA,TOK,COKE. Means this user has instances of those 3 symbol tokens.
 });
 mongoose.model('User',UserSchema);
 

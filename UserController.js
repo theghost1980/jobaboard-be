@@ -133,6 +133,7 @@ router.get('/jabUserField', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             console.log('Query on field(s):',jsonQuery);
+            console.log('tolookup:',tolookup);
             const applyTo = (tolookup !== null && tolookup !== "") ? tolookup : decoded.usernameHive;
             console.log('Apply to:',applyTo);
             User.findOne( { username: applyTo}, jsonQuery , function(err, found){

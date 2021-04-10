@@ -125,6 +125,7 @@ router.get('/findJabUser', function(req,res){
 router.get('/jabUserField', function(req,res){
     const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: 1} i.e { following: 1, ... }
+    const tolookup = req.headers['tolookup'];
     // TODO validate in case of empty query -> return 404 Funny message.
 
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -132,6 +133,8 @@ router.get('/jabUserField', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             console.log('Query on field(s):',jsonQuery);
+            const applyTo = (tolookup !== null || tolookup !== "") ? tolookup : decoded.usernameHive;
+            console.log('Apply to:',applyTo);
             User.findOne( { username: decoded.usernameHive }, jsonQuery , function(err, found){
                 if(err){
                     console.log('Error on mongoDB query.',err);

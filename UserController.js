@@ -148,6 +148,7 @@ router.get('/jabUserField', function(req,res){
 
 // Update field(s) on user
 router.post('/updateUserField', function(req,res){
+    console.log(req.headers);
     const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: value} i.e { following: ['user1','user2'], ... }
     const toUpdateOn = req.headers['toUpdateOn'];

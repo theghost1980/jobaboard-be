@@ -158,7 +158,7 @@ router.post('/updateUserField', function(req,res){
         if(decoded){
             console.log('To Update field(s):',jsonQuery);
             const applyTo = toUpdateOn ? toUpdateOn : decoded.usernameHive;
-            console.log('Apply to:')
+            console.log('Apply to:',applyTo);
             User.findOneAndUpdate( { username: applyTo }, jsonQuery, { new: true }, function(err, updated){
                 if(err){
                     console.log('Error on mongoDB field update.',err);

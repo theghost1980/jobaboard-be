@@ -151,7 +151,7 @@ router.post('/updateUserField', function(req,res){
     console.log(req.headers);
     const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query = { field: value} i.e { following: ['user1','user2'], ... }
-    const toUpdateOn = req.headers['toUpdateOn'];
+    const toUpdateOn = req.headers['toupdateon'];
     // TODO validate in case of empty query -> return 404 Funny message.
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){

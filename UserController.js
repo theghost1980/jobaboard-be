@@ -157,7 +157,8 @@ router.post('/updateUserField', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             console.log('To Update field(s):',jsonQuery);
-            const applyTo = toUpdateOn !== null ? toUpdateOn : decoded.usernameHive;
+            console.log('Apply to:',toUpdateOn);
+            const applyTo = (toUpdateOn !== null || toUpdateOn !== "") ? toUpdateOn : decoded.usernameHive;
             console.log('Apply to:',applyTo);
             User.findOneAndUpdate( { username: applyTo }, jsonQuery, { new: true }, function(err, updated){
                 if(err){

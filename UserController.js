@@ -135,7 +135,7 @@ router.get('/jabUserField', function(req,res){
             console.log('Query on field(s):',jsonQuery);
             const applyTo = (tolookup !== null || tolookup !== "") ? tolookup : decoded.usernameHive;
             console.log('Apply to:',applyTo);
-            User.findOne( { username: decoded.usernameHive }, jsonQuery , function(err, found){
+            User.findOne( { username: applyTo}, jsonQuery , function(err, found){
                 if(err){
                     console.log('Error on mongoDB query.',err);
                     return res.status(500).send({ status: 'error', error: err});

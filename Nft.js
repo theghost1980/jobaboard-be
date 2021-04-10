@@ -10,7 +10,6 @@ var NFTSchema = new mongoose.Schema({
         type: Number,
         unique: true,
     },
-    id_ext: Number,
     account: String, //actual owner of the token = nft = instance.
     image: {
         type: String,
@@ -31,14 +30,11 @@ var NFTSchema = new mongoose.Schema({
     productName: String,
     url: String,
     maxSupply: String, //but handled as a number
-    authorizedIssuingAccounts: [String], //To decide today if it is easier not to handle this here LEAVE it to Hive ssc.
     issuer: String,
     issued_On:{ //this field may help to identify if the token was created on JAB or somewhere else, as a future feature if a user uses another platform to create an nft, he may be allowed to use it on jab only if pays a fee.
         type: String,
         default:"JAB platform",
     },
-    supply: Number, //To decide today if it is easier not to handle this here LEAVE it to Hive ssc.
-    circulatingSupply: Number, //To decide today if it is easier not to handle this here LEAVE it to Hive ssc.
     for_sale: {
         type: Boolean,
         default: false,

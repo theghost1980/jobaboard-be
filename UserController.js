@@ -135,7 +135,7 @@ router.get('/jabUserField', function(req,res){
             console.log('Query on field(s):',jsonQuery);
             console.log('tolookup:',tolookup);
             console.log('decoded.usernameHive:', decoded.usernameHive);
-            const applyTo = tolookup ? tolookup : decoded.usernameHive;
+            const applyTo = tolookup !== null ? tolookup : decoded.usernameHive;
             console.log('Apply to:',applyTo);
             User.findOne( { username: applyTo}, jsonQuery , function(err, found){
                 if(err){

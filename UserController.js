@@ -164,7 +164,7 @@ router.post('/updateUserField', function(req,res){
         if(decoded){
             console.log('To Update field(s):',jsonQuery);
             console.log('Apply to:',toUpdateOn);
-            const applyTo = (toUpdateOn !== null || toUpdateOn !== "") ? toUpdateOn : decoded.usernameHive;
+            const applyTo = (toUpdateOn !== null && toUpdateOn !== "" && toUpdateOn !== "null") ? toUpdateOn : decoded.usernameHive;
             console.log('Apply to:',applyTo);
             User.findOneAndUpdate( { username: applyTo }, jsonQuery, { new: true }, function(err, updated){
                 if(err){

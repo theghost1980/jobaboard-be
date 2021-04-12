@@ -84,7 +84,9 @@ router.post('/uploadIcon', function(req,res){
             upload(req, res, function(err){
                 if(err){
                     console.log('Error processing on multer.',err);
-                    return res.status(500).send({ status: 'failed', message: err});
+                    // testing suppressing the error handler as I saw this made by other devs ???
+                    // results: 
+                    // return res.status(500).send({ status: 'failed', message: err});
                 };
                 //upload the data and grab the results.
                 if(req.file){

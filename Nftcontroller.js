@@ -72,6 +72,70 @@ let resultHandler = function (err) {
 }
 ////////////////////////////////////////////////////////////////////
 
+////////Handle the new icon image to upload and send back the image + thumb.
+router.post('/uploadIcon', function(req,res){
+    const token = req.headers['x-access-token'];
+    const sharp = require('sharp');
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            //now multer will work...work b
+            upload(req, res, function(err){
+                if(err){
+                    console.log('Error processing on multer.',err);
+                    return res.status(500).send({ status: 'failed', message: err});
+                };
+                //upload the data and grab the results.
+                if(req.file){
+                    console.log('There is file, so lets use them');
+                    cloudinary.uploader.upload(req.file.path,{ tags: 'iconNFT'}, function(error, result){
+                        if(error){
+                            console.log('Error uploading img to cloudinary.',error);
+                            return res.status(500).send({ status: 'failed', message: error});
+                        }
+                        //image is the uploaded img
+                        image = result.secure_url;
+                        console.log(`Image uploaded on update NFT info. ${image}`);
+                        let inputFile = req.file.path;
+                        let outputFile = "thumb-" + Date.now() + req.file.originalname;
+                        sharp(inputFile).resize({ width: 120 }).toFile(outputFile)
+                        .then(function(newFileInfo) {
+                            newFileInfo.path = outputFile;
+                            console.log(`Now we handle to upload:`);
+                            console.log(newFileInfo);
+                            cloudinary.uploader.upload(newFileInfo.path,{ tags: 'NFTImageThumb'}, function(error, thumbUploaded){
+                                if(error){ 
+                                    console.log('Error uploading thumb.');
+                                    return res.status(500).send({ status: 'failed', message: "Error uploading thumb, please check. " + error});
+                                }
+                                console.log('Sucess, thumb uploaded. Now we get the new name.');
+                                thumb = thumbUploaded.secure_url;
+                                console.log(`Thumb uploaded. ${thumb}`);
+                                // after resizing + uploading then we erase the file from storage
+                                    // now delete the files from local storage.
+                                    fs.unlink(req.file.path, resultHandler);
+                                    fs.unlink(newFileInfo.path, resultHandler);
+                                //we send back the new image + thumb.
+                                return res.status(200).send({ status: 'sucess', dataIcon:{ image: image, thumb: thumb }});
+                            });
+                        })
+                        .catch(function(err) {
+                            console.log("Error occured when resizing img",err);
+                        });
+                    });
+                }else{
+                    //no img file we return error.
+                    return res.status(500).send({ status: 'failed', message: "Image must be provided to use this route."});
+                }
+            });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        };
+    });
+});
+//////// END Handle the new icon image to upload
+
 //////////////////
 // todo: erase this testings handling the formdata + upload only 1 image + resize it to create the thumb.
 // const uploadtest = multer({ dest: 'uploads/' }) // to test without storing or saving the image anywhere.

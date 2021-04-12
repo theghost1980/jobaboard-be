@@ -73,7 +73,7 @@ let resultHandler = function (err) {
 ////////////////////////////////////////////////////////////////////
 
 ////////Handle the new icon image to upload and send back the image + thumb.
-router.post('/uploadIcon', function(req,res){
+router.post('/uploadIcon', async function(req,res){
     const token = req.headers['x-access-token'];
     const sharp = require('sharp');
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -86,7 +86,7 @@ router.post('/uploadIcon', function(req,res){
                     console.log('Error processing on multer.',err);
                     // testing suppressing the error handler as I saw this made by other devs ???
                     // results: 
-                    // return res.status(500).send({ status: 'failed', message: err});
+                    return res.status(500).send({ status: 'failed', message: err});
                 };
                 //upload the data and grab the results.
                 if(req.file){

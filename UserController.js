@@ -120,6 +120,35 @@ router.get('/findJabUser', function(req,res){
     });
 });
 
+// TODO: add the token per security
+// find users per fields so you can bring all those users under this query i.e:
+// for testing leaving with no token access
+router.get('/jabUsersField', function(req,res){
+    // TODO const token = req.headers['x-access-token'];
+    const jsonQuery = JSON.parse(req.headers['query']); //as query =  i.e { following: 1, ... }
+    const filter = JSON.parse(req.headers['filter']); //{ username: $in{ ["name1", "name2"]}} 
+    // const tolookup = req.headers['tolookup'];
+    // if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    // jwt.verify(token, config.secret, function(err, decoded){
+        // if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        // if(decoded){
+            console.log('Filter:',filter);
+            console.log('Query:',jsonQuery);
+            // console.log('decoded.usernameHive:', decoded.usernameHive);
+            User.find(filter, jsonQuery , function(err, founds){
+                if(err){
+                    console.log('Error on mongoDB query.',err);
+                    return res.status(500).send({ status: 'error', error: err});
+                }
+                console.log("Found:",founds);
+                res.status(200).send({ status: 'sucess', result: founds});
+            });
+        // }else{
+            // return res.status(404).send({ auth: false, message: 'Error authenticating token user getUserField.' });
+        // }
+    // });
+});
+
 // Methods to handle following field [String]
 // 1. Get following data from a user. but it serves at get a field from user.
 router.get('/jabUserField', function(req,res){

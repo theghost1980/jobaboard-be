@@ -17,6 +17,7 @@ if(config.testingData === 'true'){
     console.log(`NFT mongoDB access:${config.handleNFTEP}`);
     console.log(`Portfolio Access:${config.portfolioEP}`);
     console.log(`Public Access:${config.publicEP}`);
+    console.log(`Order Access:${config.ordersEP}`);
 }
 var Authcontroller = require('./Authcontroller');
 app.use(config.authRouteEP, Authcontroller);
@@ -55,6 +56,10 @@ app.use(config.publicEP, PublicController);
 //NFT handling on MongoDB
 var NFTController = require('./Nftcontroller');
 app.use(config.handleNFTEP, NFTController);
+
+//Orders handling EP
+const OrderController = require('./OrderController');
+app.use(config.ordersEP, OrderController);
 
 module.exports = app;
 

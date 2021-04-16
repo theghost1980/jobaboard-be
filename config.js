@@ -19,4 +19,5 @@ module.exports = {
     'logoDefault':process.env.nftDefaultLogo,
     'miniLogoDefault':process.env.nftDefaultMiniLogo,
     'handleNFTEP': process.env.handleNFT_EP,
+    'ordersEP': process.env.orders_EP,
 }

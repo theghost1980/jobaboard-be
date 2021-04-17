@@ -11,6 +11,10 @@ var JobSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    days_to_complete: { //the estimation days this gig/jobs should be completed to show to dealer
+        type: Number,
+        default: 1,
+    },
     job_type: String, //defines if employee || employer
     description: String,
     images: [String], //as support if the job needs it.

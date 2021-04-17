@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+const Nft = require('./Nft');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
@@ -31,7 +32,7 @@ router.get('/getField', function(req, res){
     }
 })
 
-//////Public routes for user
+//////Public routes for Jobs
 router.get('/getActiveJobs', function(req, res){
     const username = req.headers['username'];
     if(config.testingData){ console.log('To find:', username)};
@@ -51,5 +52,37 @@ router.get('/getActiveJobs', function(req, res){
 })
 ///////////////////////////////////////////////////////////////////////
 
+///////////Public routes for NFTs///////////
+//get all token based on query, handling the query on headers.
+router.get('/getNFTquery', function(req,res){
+    const query = req.headers['query'];
+    const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || public empty query has been made!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    //TODO process the query check for nulls || "" and create teh newQuery.
+    const newNode = {};
+    Object.entries(jsonQuery).forEach(([key, val]) => {
+        if(val !== null && val !== ""){
+            return (newNode[key] = val);
+        }
+    });
+    console.log('New public query to process on NFTs');
+    console.log(newNode, `Limit:${limit}`);
+    console.log('Sortby:',sortby);
+    Nft.find(newNode,function(err,tokens){
+        if(err){
+            if(config.testingData){
+                console.log('Error finding Nft',err);
+            }
+            return res.status(500).send({ error: 'Error searching for Nft', message: err});
+        }
+        return res.status(200).send({ status: 'sucess', result: tokens });
+    }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
+});
+////////////////////////////////////////////
 
 module.exports = router;

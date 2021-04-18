@@ -302,6 +302,47 @@ router.post('/createOrder', function(req,res){
     });
 });
 
+//look up into orders by filter and options
+router.get('/getOrderquery', function(req,res){
+    const query = req.headers['query'];
+    const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || public empty query has been made on Orders!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+
+        if(decoded){
+            //TODO process the query check for nulls || "" and create teh newQuery.
+            const newNode = {};
+            Object.entries(jsonQuery).forEach(([key, val]) => {
+                if(val !== null && val !== ""){
+                    return (newNode[key] = val);
+                }
+            });
+            console.log('New query to process on Orders, user:',decoded.usernameHive);
+            console.log(newNode, `Limit:${limit}`);
+            console.log('Sortby:',sortby);
+            Order.find(newNode,function(err,orders){
+                if(err){
+                    if(config.testingData){
+                        console.log('Error finding Order',err);
+                    }
+                    return res.status(500).send({ error: 'Error searching for Orders', message: err});
+                }
+                return res.status(200).send({ status: 'sucess', result: orders });
+            }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+//END look up into orders by filter and options
+
 //get all token based on query, handling the query on headers.
 // router.get('/getNFTquery', function(req,res){
 //     const token = req.headers['x-access-token'];

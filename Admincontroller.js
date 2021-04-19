@@ -13,6 +13,45 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
 
+//in order to being able to handle images here all definitions on cloudinary + multer
+//declarations
+//cloudinary CDN images
+var cloudinary = require('cloudinary').v2;
+//config
+cloudinary.config({
+    cloud_name: config.cloud_name,
+    api_key: config.api_key,
+    api_secret: config.api_secret,
+});
+/////////////
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Destination:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, __dirname + '/uploads')
+    },
+    filename: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Filename:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, file.fieldname + '_' + Date.now() + "_" + file.originalname);
+    }
+});  
+const upload = multer({ storage: storage }).single("file");
+
+//////to delete the file after sending it to cloud
+const fs = require('fs');
+let resultHandler = function (err) {
+    if (err) {
+        console.log("unlink failed", err);
+    } else {
+        console.log("file deleted from temporary server storage");
+    }
+}
+////////////////////////////////////////////////////////////////////
+
 // BAN USER
 // ---> TODO: Ask for better logic, maybe just the admins can ban users and not admins.
 router.post('/ban/:username', function(req, res){
@@ -72,8 +111,8 @@ router.get('/getCats', function(req,res){
                     if(config.testingData){console.log('Error searching for admin.',err)};
                     return res.status(500).send({ status: 'failed', message: err});
                 }
-                if(found.usertype != 'admin'){
-                    if(config.testingData){ console.log('User not admin.',found)};
+                if(admin.usertype != 'admin'){
+                    if(config.testingData){ console.log('User not admin.',admin)};
                     return res.status(404).send({ status: 'failed', message: 'User not an admin!'});
                 }else{
                     const filter = jsonQuery.query === "all" ? {} : jsonQuery;

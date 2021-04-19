@@ -3,8 +3,9 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-var User = require('./User');
-var Logs = require('./Logs');
+const User = require('./User');
+const Logs = require('./Logs');
+const Category = require('./Category');
 // TODO: add logs access withint admincontroller and remove it from
 // logs- maybe?
 // var Logs = require('../logs/Logs');
@@ -55,6 +56,42 @@ router.post('/ban/:username', function(req, res){
     });
 })
 /////////////////////////
+
+////////Web content section
+/////handling the categories + sub cats
+router.get('/getCats', function(req,res){
+    const token = req.headers['x-access-token'];
+    const jsonQuery = JSON.parse(req.headers['query']);
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            //as soon as we decode we search to verify is an admin.
+            User.findOne({ username: decoded.usernameHive }, function(err,admin){
+                if(err){
+                    if(config.testingData){console.log('Error searching for admin.',err)};
+                    return res.status(500).send({ status: 'failed', message: err});
+                }
+                if(found.usertype != 'admin'){
+                    if(config.testingData){ console.log('User not admin.',found)};
+                    return res.status(404).send({ status: 'failed', message: 'User not an admin!'});
+                }else{
+                    const filter = jsonQuery.query === "all" ? {} : jsonQuery;
+                    Category.find(filter, function(err,category){
+                        if(err){
+                            if(config.testingData){console.log('Error searching for categories.',err)};
+                            return res.status(500).send({ status: 'failed', message: err});
+                        }
+                        return res.status(200).send({ status: 'sucess', result: category});
+                    });
+                }
+            })
+        }else{
+
+        }
+    });
+});
+////////END Web content section
 
 
 module.exports = router;

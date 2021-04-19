@@ -10,6 +10,9 @@ const Nft = require('./Nft');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
+//to handle publicc queries as the JABblockexplorer
+const SSC = require('sscjs');
+const ssc = new SSC(config.SSC_node);
 
 ///////////////////////////////////////////////////////////////////////
 //////Public routes for user
@@ -51,6 +54,29 @@ router.get('/getActiveJobs', function(req, res){
     }
 })
 ///////////////////////////////////////////////////////////////////////
+
+////////Public routes for blocks on hive node
+////for now checking the test node
+////TODO move to the main hive net
+//to handle tx
+router.get('/tx', function(req, res){
+    //testing to look up a particular tx on the test SSC server
+    const tx = req.headers['tx'];
+    if(!tx){
+        return res.status(404).send({ status: 'failed', message: 'No Tx id was provided. Funny guy!'});
+    }
+    console.log(`Public Looking into tx:${tx}`);
+    ssc.getTransactionInfo(tx, function(err, result){
+        if(result === null){ return res.status(200).send({ status: 'askAgain'})}
+        if(err){
+            if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+            return res.status(500).send({ result: 'error', error: err});
+        }
+        // if(config.testingData){console.log(result);}
+        res.status(200).send(result);
+    });
+});
+////////END Public routes for blocks on hive node
 
 ///////////Public routes for NFTs///////////
 //get all token based on query, handling the query on headers.

@@ -20,4 +20,5 @@ module.exports = {
     'miniLogoDefault':process.env.nftDefaultMiniLogo,
     'handleNFTEP': process.env.handleNFT_EP,
     'ordersEP': process.env.orders_EP,
+    'SSC_main': process.env.ssc_node_main,
 }

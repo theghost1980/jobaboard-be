@@ -13,6 +13,7 @@ const time = new Date();
 //to handle publicc queries as the JABblockexplorer
 const SSC = require('sscjs');
 const ssc = new SSC(config.SSC_node);
+const sscMain = new SSC(config.SSC_main);
 
 ///////////////////////////////////////////////////////////////////////
 //////Public routes for user
@@ -55,9 +56,13 @@ router.get('/getActiveJobs', function(req, res){
 })
 ///////////////////////////////////////////////////////////////////////
 
-////////Public routes for blocks on hive node
-////for now checking the test node
-////TODO move to the main hive net
+////////Public routes for blocks on hive node main
+////The tx for transfers always will live under the main NET
+////We may choose bewteen: ssc for test node and sscMain for main.
+// on sscMain:
+// - tx money transfers
+// on ssc:
+// - nft created, actual nft, instances.
 //to handle tx
 router.get('/tx', function(req, res){
     //testing to look up a particular tx on the test SSC server
@@ -66,7 +71,7 @@ router.get('/tx', function(req, res){
         return res.status(404).send({ status: 'failed', message: 'No Tx id was provided. Funny guy!'});
     }
     console.log(`Public Looking into tx:${tx}`);
-    ssc.getTransactionInfo(tx, function(err, result){
+    sscMain.getTransactionInfo(tx, function(err, result){
         if(result === null){ return res.status(200).send({ status: 'askAgain'})}
         if(err){
             if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  

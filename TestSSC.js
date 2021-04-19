@@ -83,7 +83,7 @@ router.get('/allInstances', function(req, res){
 });
 
 //to handle tx
-router.get('/txMain', function(req, res){
+router.get('/tx', function(req, res){
     //testing to look up a particular tx on the test SSC server
     const tx = req.headers['tx'];
     const token = req.headers['x-access-token'];

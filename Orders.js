@@ -9,6 +9,7 @@ var OrderSchema = new mongoose.Schema({
     note: String, //used for 'cancellation' or "anything else needed".
     nft_id: Number,
     nft_symbol: String,
+    nft_amount: Number, //represent the amount of NFTs the user will give/get, depending on order type.
     nft_price_on_init: Number, //respresent the price when the order was emitted. In case we may want to allow users to change prices on their nft later on without affecting on going orders.
     job_id: String,
     job_title: String, //used to check if maybe the user placed the same order twice.

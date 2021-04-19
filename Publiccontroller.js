@@ -63,8 +63,7 @@ router.get('/getActiveJobs', function(req, res){
 // - tx money transfers
 // on ssc:
 // - nft created, actual nft, instances.
-//to handle tx
-router.get('/tx', function(req, res){
+router.get('/tx', function(req, res){ //loop up for money transfers.
     //testing to look up a particular tx on the test SSC server
     const tx = req.headers['tx'];
     if(!tx){
@@ -72,7 +71,7 @@ router.get('/tx', function(req, res){
     }
     console.log(`Public Looking into tx:${tx}`);
     sscMain.getTransactionInfo(tx, function(err, result){
-        if(result === null){ return res.status(200).send({ status: 'askAgain'})}
+        // if(result === null){ return res.status(200).send({ status: 'askAgain'})}
         if(err){
             if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
             return res.status(500).send({ result: 'error', error: err});

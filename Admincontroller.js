@@ -119,7 +119,7 @@ router.post('/addCat', function(req,res){
                 }
                 if(catFound){
                     if(config.testingData){console.log('Category already exists.', catFound)};
-                    return res.status(404).send({ status: 'failed', message: 'Please choose another category Name and query.'});
+                    return res.status(200).send({ status: 'failed', message: 'Please choose another category Name and query.'});
                 }
                 //as we don't find any, we add so multer get to work from here.
                 upload(req, res, function(err){

@@ -196,7 +196,7 @@ router.post('/addCat', function(req,res){
                 res.status(500).send({ status: 'failed', message: err});
             }
             console.log('Added new Category',newCat);
-            res.status(200).send({ status: 'success', result: newCat});
+            res.status(200).send({ status: 'sucess', result: newCat});
         })
     };
 });

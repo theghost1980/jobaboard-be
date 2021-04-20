@@ -188,6 +188,8 @@ router.post('/addCat', function(req,res){
             data.image = image;
             data.thumb = thumb;
         }
+        const sub_category = JSON.parse(data.sub_category);
+        data.sub_category = [...sub_category];
         // data.authorizedIssuingAccounts = JSON.parse(data.authorizedIssuingAccounts);
         console.log("We're about to save::::");
         console.log(data);

@@ -12,6 +12,7 @@ const Category = require('./Category');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
+const sharp = require('sharp');
 
 //in order to being able to handle images here all definitions on cloudinary + multer
 //declarations
@@ -165,6 +166,7 @@ router.post('/addCat', function(req,res){
                             })
                             .catch(function(err) {
                                 console.log("Error occured when resizing img",err);
+                                return res.status(500).send({ status: 'failed', message: err});
                             });
                         });
                     }else{

@@ -111,6 +111,7 @@ router.post('/addCat', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             const filter = JSON.parse(query);
+            //forcing to rebuild
             Category.findOne(filter, function(err,catFound){
                 if(err){
                     if(config.testingData){console.log('Error searching for category.',err)};

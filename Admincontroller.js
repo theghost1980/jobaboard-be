@@ -98,6 +98,30 @@ router.post('/ban/:username', function(req, res){
 /////////////////////////
 
 ////////Web content section
+///handling delete category
+router.post('/deleteCat', function(req,res){
+    const token = req.headers['x-access-token'];
+    const catid = req.headers['catid'];
+    if(!catid){
+        if(config.testingData){ console.log('Cat deletion request no id provided.')}
+        return res.status(404).send({ status: 'failed', message: 'I cannot delete no Id cat. Funny guy!'});
+    }
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            Category.deleteOne({ _id: catid }, function(err,deleted){
+                if(err){
+                    if(config.testingData){ console.log('Error when deleting Category.',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: deleted });
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        };
+    });
+});
 /////handling adding a new cat if not found under same name & query as those are the important fields
 router.post('/addCat', function(req,res){
     const token = req.headers['x-access-token'];

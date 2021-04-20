@@ -104,28 +104,28 @@ router.post('/addCat', function(req,res){
     const query = req.headers['query']; //as { name: 'string', query: 'string'} name of category and query in order to search if already exists or not.
     if(!query){
         if(config.testingData){ console.log('Not query provided.')};
-        return res.status(404).send({ status:'failed', message: 'I cannot process empty queries. Funny boy!'});
+        return res.status(404).send({ 'status':'failed', 'message': 'I cannot process empty queries. Funny boy!'});
     }
-    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    if(!token) return res.status(404).send({ 'auth': false, 'message': 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
-        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(err) return res.status(500).send({ 'auth': false, 'message': 'Failed to authenticate token.' });
         if(decoded){
             const filter = JSON.parse(query);
             //forcing to rebuild
             Category.findOne(filter, function(err,catFound){
                 if(err){
                     if(config.testingData){console.log('Error searching for category.',err)};
-                    return res.status(500).send({ status: 'failed', message: err});
+                    return res.status(500).send({ 'status': 'failed', 'message': err});
                 }
                 if(catFound){
                     if(config.testingData){console.log('Category already exists.', catFound)};
-                    return res.status(200).send({ status: 'failed', message: 'Please choose another category Name and query.'});
+                    return res.status(200).send({ 'status': 'failed', 'message': 'Please choose another category Name and query.'});
                 }
                 //as we don't find any, we add so multer get to work from here.
                 upload(req, res, function(err){
                     if(err){
                         console.log('Error processing on multer.',err);
-                        return res.status(500).send({ status: 'failed', message: err});
+                        return res.status(500).send({ 'status': 'failed', 'message': err});
                     };
                     //upload the data and grab the results.
                     if(req.file){
@@ -134,7 +134,7 @@ router.post('/addCat', function(req,res){
                             if(error){
                                 console.log('Error uploading img to cloudinary.',error);
                                 //as we really need the image to make the cat work we stop here and return err
-                                return res.status(500).send({ status: 'failed', message: error});
+                                return res.status(500).send({ 'status': 'failed', 'message': error});
                             }
                             //image is the uploaded img
                             image = result.secure_url;
@@ -153,7 +153,7 @@ router.post('/addCat', function(req,res){
                                 cloudinary.uploader.upload(newFileInfo.path,{ tags: 'newCatThumb'}, function(error, thumbUploaded){
                                     if(error){ 
                                         if(config.testingData) {console.log('Error uploading thumb.',error)}
-                                        return res.status(500).send({ status: 'failed', message: error});
+                                        return res.status(500).send({ 'status': 'failed', 'message': error});
                                     }
                                     console.log('Sucess, thumb uploaded. Now we get the new name.');
                                     thumb = thumbUploaded.secure_url;
@@ -167,17 +167,17 @@ router.post('/addCat', function(req,res){
                             })
                             .catch(function(err) {
                                 console.log("Error occured when resizing img",err);
-                                return res.status(500).send({ status: 'failed', message: err});
+                                return res.status(500).send({ 'status': 'failed', 'message': err});
                             });
                         });
                     }else{
                         //no img file we ureturn error as image must be provided for any cat.
-                        return res.status(404).send({ status: 'failed', message: 'Each new category must have an image. Please retry but adding an image, following the specifications.'});
+                        return res.status(404).send({ 'status': 'failed', 'message': 'Each new category must have an image. Please retry but adding an image, following the specifications.'});
                     }
                 });
             });
         }else{
-            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+            return res.status(500).send({ 'auth': false, 'message': 'Failed to decode token.' });
         };
     });
     //function to handle the saving process
@@ -194,10 +194,10 @@ router.post('/addCat', function(req,res){
         Category.create(data, function(err,newCat){
             if(err){
                 console.log('Error when adding new Category.',err);
-                res.status(500).send({ status: 'failed', message: err});
+                res.status(500).send({ 'status': 'failed', 'message': err});
             }
             console.log('Added new Category',newCat);
-            res.status(200).send({ status: 'sucess', result: newCat});
+            res.status(200).send({ 'status': 'sucess', 'result': newCat});
         })
     };
 });

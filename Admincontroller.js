@@ -188,7 +188,7 @@ router.post('/updateCat', function(req,res){
                                         // now delete the files from local storage.
                                         fs.unlink(req.file.path, resultHandler);
                                         fs.unlink(newFileInfo.path, resultHandler);
-                                    updateCat(req);
+                                    updateCat(req,filter);
                                 });
                             })
                             .catch(function(err) {
@@ -198,7 +198,7 @@ router.post('/updateCat', function(req,res){
                         });
                     }else{
                         //no img file but we update the rest of data!
-                        updateCat(req);
+                        updateCat(req,filter);
                     }
                 });
             });
@@ -207,7 +207,7 @@ router.post('/updateCat', function(req,res){
         }
     });
     //function to handle the updating process
-    function updateCat(req){
+    function updateCat(req,filter){
         //we create it or at leaast we try to
         var data = req.body;
         if(image && thumb){
@@ -219,7 +219,7 @@ router.post('/updateCat', function(req,res){
         // data.authorizedIssuingAccounts = JSON.parse(data.authorizedIssuingAccounts);
         console.log("We're about to update::::");
         console.log(data);
-        Category.updateOne(data, function(err,updatedCat){
+        Category.updateOne(filter, data, function(err,updatedCat){
             if(err){
                 console.log('Error when updating Category.',err);
                 return res.status(500).send({ status: 'failed', message: err});

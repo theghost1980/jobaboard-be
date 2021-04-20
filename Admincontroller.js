@@ -3,9 +3,9 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
-const User = require('./User');
-const Logs = require('./Logs');
-const Category = require('./Category');
+var User = require('./User');
+var Logs = require('./Logs');
+var Category = require('./Category');
 // TODO: add logs access withint admincontroller and remove it from
 // logs- maybe?
 // var Logs = require('../logs/Logs');

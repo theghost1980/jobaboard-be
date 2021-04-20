@@ -13,6 +13,7 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
 const sharp = require('sharp');
+var cors = require('cors')
 
 //in order to being able to handle images here all definitions on cloudinary + multer
 //declarations
@@ -99,7 +100,7 @@ router.post('/ban/:username', function(req, res){
 
 ////////Web content section
 /////handling adding a new cat if not found under same name & query as those are the important fields
-router.post('/addCat', function(req,res){
+router.post('/addCat', cors(), function(req,res){
     const token = req.headers['x-access-token'];
     const query = req.headers['query']; //as { name: 'string', query: 'string'} name of category and query in order to search if already exists or not.
     if(!query){

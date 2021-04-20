@@ -4,7 +4,9 @@ var cors = require('cors')
 var db = require('./db');
 const config = require('./config');
 // const fileupload = require('express-fileupload')
-
+//use cors
+app.use(cors());
+//authorization End Point/Controller
 
 if(config.testingData === 'true'){
     console.log(`Auth Route:${config.authRouteEP}`);
@@ -58,10 +60,6 @@ app.use(config.handleNFTEP, NFTController);
 //Orders handling EP
 const OrderController = require('./OrderController');
 app.use(config.ordersEP, OrderController);
-
-//use cors
-app.use( cors() );
-//authorization End Point/Controller
 
 module.exports = app;
 

@@ -12,8 +12,7 @@ var CategorySchema = new mongoose.Schema({
     },
     sub_category: [String],
     image: String, 
-    hideOnLoggin: Boolean, 
-    link: Boolean,
+    thumb: String,
     active: Boolean,
 });
 mongoose.model('Category', CategorySchema);

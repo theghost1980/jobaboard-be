@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var LogsSchema = new mongoose.Schema({
+    is_system: Boolean,
+    log_type: String,//as 'admin'
     username: String,
     usertype: String,
     ipaddress: String,

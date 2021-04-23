@@ -43,7 +43,7 @@ const storage = multer.diskStorage({
     }
 });  
 const upload = multer({ storage: storage }).single("file");
-const uploadS = multer({ storage: storage }).array("file"); //to use on multiple so we can keep the first one as uploading one file only
+const uploadMultiple = multer({ storage: storage }).array("file"); //to use on multiple so we can keep the first one as uploading one file only
 //////to delete the file after sending it to cloud
 const fs = require('fs');
 let resultHandler = function (err) {
@@ -109,7 +109,7 @@ router.post('/uploadImgsToBank',function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //cloudinary loop depending if at least one image to upload to server.
-            upload(req, res, function (err) {
+            uploadMultiple(req, res, function (err) {
                 if (err) {
                     console.log('Err Uploading Multiple Images.',err);
                     return res.status({ status: 'failed', message: err });

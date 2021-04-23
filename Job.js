@@ -33,6 +33,11 @@ var JobSchema = new mongoose.Schema({
     verifyed_profiles_only: Boolean, 
     createdAt: Date,
     updatedAt: Date,
+    blocked: {
+        type: Boolean,
+        default: false,
+    }, //just can be filled by system or admins
+    note: String,//the note with details about this blocked status
 });
 mongoose.model('Job',JobSchema);
 

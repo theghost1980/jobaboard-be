@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+var Image = require('./Image'); //this one for now do not a controller but can be used anywhere, for now just in admincontroller.
 var Category = require('./Category');
 // TODO: add logs access withint admincontroller and remove it from
 // logs- maybe?
@@ -42,7 +43,7 @@ const storage = multer.diskStorage({
     }
 });  
 const upload = multer({ storage: storage }).single("file");
-
+const uploadS = multer({ storage: storage }).array("file"); //to use on multiple so we can keep the first one as uploading one file only
 //////to delete the file after sending it to cloud
 const fs = require('fs');
 let resultHandler = function (err) {
@@ -97,6 +98,63 @@ router.post('/ban/:username', function(req, res){
     });
 })
 /////////////////////////
+
+//////Special sections a upload images into Images Bank for the blog
+router.post('/uploadImgsToBank',function(req,res){
+    const token = req.headers['x-access-token'];
+    const thumbs = req.headers['createthumbs']; //as 'true' or 'false'
+    //TODO check if userType = 'admin'
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            //cloudinary loop depending if at least one image to upload to server.
+            upload(req, res, function (err) {
+                if (err) {
+                    console.log('Err Uploading Multiple Images.',err);
+                    return res.status({ status: 'failed', message: err });
+                }
+                let res_promises = req.files.map(file => new Promise((resolve,reject) => {
+                    cloudinary.uploader.upload(file.path,{ tags: 'testMultiple'}, function(err, image){
+                        if(err) reject(err) 
+                        else {
+                            resolve(image.secure_url);
+                            fs.unlink(file.path, resultHandler);
+                        }
+                    })
+                })
+                )
+                Promise.all(res_promises)
+                .then(result => { //result is the array holding the images as we need them.
+                    const images = result;
+                    if(config.testingData){ console.log('To save:',images)};
+                    // for testing
+                    if(thumbs === 'true'){
+                        // TODO.
+                        //make an extra loop to get thumbs using sharp.
+                    }else{
+                        const resultDocs = [];
+                        images.forEach(image => {
+                            Image.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
+                                if(err){
+                                    if(config.testingData){ console.log('Error when adding image from collection to DB.',err)};
+                                    return res.status(500).send({ status: 'failed', message: err });
+                                }
+                                resultDocs.push(createdImg);
+                            });
+                        });
+                        return res.status(200).send({ status: 'sucess', result: resultDocs }) //sucess
+                    }
+                })
+                .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
+            });
+            //END cloudinary loop
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+//////END Special sections a upload images into Images Bank for the blog
 
 ///////Job sections controlled by Admins
 ///////////handling job queries from admins

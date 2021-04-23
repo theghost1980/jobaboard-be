@@ -134,7 +134,7 @@ router.post('/uploadImgsToBank',function(req,res){
                         // TODO.
                         //make an extra loop to get thumbs using sharp.
                     }else{
-                        const resultDocs = [];
+                        var resultDocs = [];
                         images.forEach(image => {
                             Img.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
                                 if(err){
@@ -144,6 +144,7 @@ router.post('/uploadImgsToBank',function(req,res){
                                 resultDocs.push(createdImg);
                             });
                         });
+                        if(config.testingData){ console.log('Created new images:', resultDocs)};
                         return res.status(200).send({ status: 'sucess', result: resultDocs }) //sucess
                     }
                 })

@@ -6,6 +6,7 @@ var ImageSchema = new mongoose.Schema({
     thumb: {
         type: String,
         default: 'notSet',
+        unique: false,
     },
     title: String, //optional if needed for later.
     relatedTo: [String], //optional to define a bit more than tags if needed.

@@ -126,7 +126,6 @@ router.get('/getImgBank',function(req,res){
         }
     });
 });
-});
 //////END handle get the images on DB
 //////Special sections a upload images into Images Bank for the blog
 router.post('/uploadImgsToBank',function(req,res){

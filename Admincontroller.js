@@ -127,6 +127,44 @@ router.get('/getJob', function(req,res){
     });
 });
 ///////////END handling job queries from admins
+//////////handling update one field on job by admins || system - originally just to handle blocked, note.
+router.post('/updateJobField', function(req,res){
+    const token = req.headers['x-access-token'];
+    const filter = JSON.parse(req.headers['filter']);//as { username: '', _id: ''} mandatory to process the update
+    const parsedFilter = JSON.parse(filter);
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            upload(req, res, function(err){
+                if(err){
+                    console.log('Error processing on multer.',err);
+                    return res.status(500).send({ status: 'failed', message: err});
+                };
+                //upload the data and grab the results.
+                if(config.testingData){
+                    console.log('filtering on Update/job AdminController:',parsedFilter);
+                    console.log('Admin:', decoded.usernameHive);
+                    console.log('About to update:',req.body);
+                }
+                if(req.file){
+                    //for now we don't use this but leave it for future use.
+                }else{
+                    Job.findOneAndUpdate(filter, req.body,function(err, updatedJob){
+                        if(err){
+                            if(config.testingData) {console.log('Error updating fields on jobs',err)};
+                            return res.status(500).send({ status: 'failed', message: err });
+                        }
+                        return res.status(200).send({ status: 'sucess', result: updatedJob });
+                    });
+                }
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+
+});
 ///////END Job sections controlled by Admins
 
 ////////Web content section

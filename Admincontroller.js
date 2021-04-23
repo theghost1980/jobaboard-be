@@ -131,7 +131,6 @@ router.get('/getJob', function(req,res){
 router.post('/updateJobField', function(req,res){
     const token = req.headers['x-access-token'];
     const filter = JSON.parse(req.headers['filter']);//as { username: '', _id: ''} mandatory to process the update
-    const parsedFilter = JSON.parse(filter);
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -143,7 +142,7 @@ router.post('/updateJobField', function(req,res){
                 };
                 //upload the data and grab the results.
                 if(config.testingData){
-                    console.log('filtering on Update/job AdminController:',parsedFilter);
+                    console.log('filtering on Update/job AdminController:',filter);
                     console.log('Admin:', decoded.usernameHive);
                     console.log('About to update:',req.body);
                 }

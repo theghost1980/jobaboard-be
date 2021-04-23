@@ -149,7 +149,7 @@ router.post('/updateJobField', function(req,res){
                 if(req.file){
                     //for now we don't use this but leave it for future use.
                 }else{
-                    Job.findOneAndUpdate(filter, req.body,function(err, updatedJob){
+                    Job.findOneAndUpdate(filter, req.body, { returnNewDocument: true },function(err, updatedJob){
                         if(err){
                             if(config.testingData) {console.log('Error updating fields on jobs',err)};
                             return res.status(500).send({ status: 'failed', message: err });

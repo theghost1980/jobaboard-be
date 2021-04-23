@@ -3,7 +3,10 @@ var mongoose = require('mongoose');
 // used for now just to handle images used in the JAB hive blog. Later on we can use it as central images bank.
 var ImageSchema = new mongoose.Schema({
     image: String, 
-    thumb: String,
+    thumb: {
+        type: String,
+        default: 'notSet',
+    },
     title: String, //optional if needed for later.
     relatedTo: [String], //optional to define a bit more than tags if needed.
     tags: [String],

@@ -39,6 +39,7 @@ app.use(config.adminEP, AdminsController);
 var JobController = require('./Jobcontroller.js');
 app.use(config.jobEP, JobController);
 // //jobs
+// TODO fix this and is better to add a route just for admins on admin and not to mix.
 var JobController = require('./Jobcontroller.js');
 app.use(config.adminEP, JobController);
 // Portfolio route

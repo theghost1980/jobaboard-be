@@ -5,6 +5,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
+var Job = require('./Job');
 var Category = require('./Category');
 // TODO: add logs access withint admincontroller and remove it from
 // logs- maybe?
@@ -96,6 +97,37 @@ router.post('/ban/:username', function(req, res){
     });
 })
 /////////////////////////
+
+///////Job sections controlled by Admins
+///////////handling job queries from admins
+router.get('/getJob', function(req,res){
+    const token = req.headers['x-access-token'];
+    const filter = JSON.parse(req.headers['filter']) || {};
+    const limit = Number(req.headers['limit']) || 0; //just in case no number comes from request.
+    const sort = JSON.parse(req.headers['sort']) || {}; //as { createdAt: -1 } { field: -1} -1 desc || { field: 1} 1 asc.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){
+                console.log('filtering on jobs AdminController:',filter);
+                console.log('Limit:',limit);
+                console.log('Sort:',sort)
+            }
+            Job.find(filter, function(err, jobs){
+                if(err){
+                    if(config.testingData) {console.log('Error finding jobs',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: jobs });
+            }).sort(sort).limit(limit)
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+///////////END handling job queries from admins
+///////END Job sections controlled by Admins
 
 ////////Web content section
 ///handling delete category

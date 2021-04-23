@@ -100,7 +100,33 @@ router.post('/ban/:username', function(req, res){
 })
 /////////////////////////
 //////handle get the images on DB
-
+router.get('/getImgBank',function(req,res){
+    const token = req.headers['x-access-token'];
+    const filter = JSON.parse(req.headers['filter']) || {};
+    const limit = Number(req.headers['limit']) || 0; //just in case no number comes from request.
+    const sort = JSON.parse(req.headers['sort']) || {}; //as { createdAt: -1 } { field: -1} -1 desc || { field: 1} 1 asc.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){
+                console.log('filtering on jobs AdminController:',filter);
+                console.log('Limit:',limit);
+                console.log('Sort:',sort)
+            }
+            Img.find(filter, function(err, imgs){
+                if(err){
+                    if(config.testingData) {console.log('Error finding on images bank',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: imgs });
+            }).sort(sort).limit(limit)
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+});
 //////END handle get the images on DB
 //////Special sections a upload images into Images Bank for the blog
 router.post('/uploadImgsToBank',function(req,res){

@@ -125,8 +125,7 @@ router.post('/uploadImgsToBank',function(req,res){
                             fs.unlink(file.path, resultHandler);
                         }
                     })
-                })
-                )
+                }))
                 Promise.all(res_promises)
                 .then(result => { //result is the array holding the images as we need them.
                     const images = result;
@@ -136,19 +135,20 @@ router.post('/uploadImgsToBank',function(req,res){
                         // TODO.
                         //make an extra loop to get thumbs using sharp.
                     }else{
-                        var resultDocs = [];
-                        images.forEach(image => {
+                        let save_promises = images.map(image => new Promise((resolve,reject) => {
                             Img.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
-                                if(err){
-                                    if(config.testingData){ console.log('Error when adding image from collection to DB.',err)};
-                                    return res.status(500).send({ status: 'failed', message: err });
+                                if(err) reject(err) 
+                                else {
+                                    resolve(createdImg);
                                 }
-                                if(config.testingData){ console.log('Created:,', createdImg)};
-                                resultDocs.push(createdImg);
-                            });
-                        });
-                        if(config.testingData){ console.log('Created new images:', resultDocs)};
-                        return res.status(200).send({ status: 'sucess', result: resultDocs }) //sucess
+                            })
+                        }))
+                        Promise.all(save_promises)
+                        .then(result =>{//result is the array holding the images as we need them.
+                            if(config.testingData){ console.log('Created new images:', result)};
+                            return res.status(200).send({ status: 'sucess', result: result }) //sucess
+                        })
+                        .catch((error) => { res.status(500).send({'status': 'failed', 'message': error})});
                     }
                 })
                 .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});

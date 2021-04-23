@@ -115,7 +115,7 @@ router.post('/uploadImgsToBank',function(req,res){
                     return res.status({ status: 'failed', message: err });
                 }
                 let res_promises = req.files.map(file => new Promise((resolve,reject) => {
-                    cloudinary.uploader.upload(file.path,{ tags: 'testMultiple'}, function(err, image){
+                    cloudinary.uploader.upload(file.path,{ tags: JSON.parse(req.body.tags)}, function(err, image){
                         if(err) reject(err) 
                         else {
                             resolve(image.secure_url);

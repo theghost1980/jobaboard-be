@@ -7,6 +7,7 @@ var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
 var Image = require('./Image'); //this one for now do not a controller but can be used anywhere, for now just in admincontroller.
+var Img = require('./Img'); //using this one as it seems when created it prints the first config and cannot change later on
 var Category = require('./Category');
 // TODO: add logs access withint admincontroller and remove it from
 // logs- maybe?
@@ -135,7 +136,7 @@ router.post('/uploadImgsToBank',function(req,res){
                     }else{
                         const resultDocs = [];
                         images.forEach(image => {
-                            Image.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
+                            Img.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
                                 if(err){
                                     if(config.testingData){ console.log('Error when adding image from collection to DB.',err)};
                                     return res.status(500).send({ status: 'failed', message: err });

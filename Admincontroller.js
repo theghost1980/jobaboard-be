@@ -99,7 +99,9 @@ router.post('/ban/:username', function(req, res){
     });
 })
 /////////////////////////
+//////handle get the images on DB
 
+//////END handle get the images on DB
 //////Special sections a upload images into Images Bank for the blog
 router.post('/uploadImgsToBank',function(req,res){
     const token = req.headers['x-access-token'];
@@ -141,6 +143,7 @@ router.post('/uploadImgsToBank',function(req,res){
                                     if(config.testingData){ console.log('Error when adding image from collection to DB.',err)};
                                     return res.status(500).send({ status: 'failed', message: err });
                                 }
+                                if(config.testingData){ console.log('Created:,', createdImg)};
                                 resultDocs.push(createdImg);
                             });
                         });

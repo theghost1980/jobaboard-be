@@ -98,6 +98,7 @@ router.post('/ban/:username', function(req, res){
         }
     });
 })
+
 /////////////////////////
 //////handle get the images on DB
 router.get('/getImgBank',function(req,res){
@@ -121,6 +122,32 @@ router.get('/getImgBank',function(req,res){
                 }
                 return res.status(200).send({ status: 'sucess', result: imgs });
             }).sort(sort).limit(limit)
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+//////END handle get the images on DB
+//////handle get the images on DB
+router.post('/deleteImgOnBank',function(req,res){
+    // TODO: i have a better idea, we should use the OPlogger right here instead that on client.
+    // this will improve client's performance as server is much more powerful...DA!!!
+    const token = req.headers['x-access-token'];
+    const filter = JSON.parse(req.headers['filter']); //as { _id: '' } in order to handle it better.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){
+                console.log('filtering to Delete on jobs AdminController:',filter);
+            }
+            Img.deleteOne(filter, function(err, ack){
+                if(err){
+                    if(config.testingData) {console.log('Error deleting on images bank',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: ack });
+            })
         }else{
             return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
         }

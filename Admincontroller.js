@@ -159,6 +159,8 @@ router.post('/deleteImgOnBank',function(req,res){
 router.post('/uploadImgsToBank',function(req,res){
     const token = req.headers['x-access-token'];
     const thumbs = req.headers['createthumbs']; //as 'true' or 'false'
+    return console.log(req.headers);
+    
     var thumbImagesUploaded = [];
     //TODO check if userType = 'admin'
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -195,6 +197,7 @@ router.post('/uploadImgsToBank',function(req,res){
                     // todo and move the create process to it own function and pass the req + thumbImagesUploaded.
                 }else{
                     // todo and move the create process to it own function and pass just the req.
+                    return res.status(404).send({ status: 'failed', message: 'Still need to improve this router!'});
                 }
                 //stoping until here for testing the thumbs processing
                 let res_promises = req.files.map(file => new Promise((resolve,reject) => {

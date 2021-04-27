@@ -178,9 +178,9 @@ router.post('/uploadImgsToBank',function(req,res){
                 }
                 if(thumbs === 'true' || thumbs === "true"){
                     if(config.testingData) { console.log('Creating thumbs as requested!!!')};
-                    req.files.forEach(file => {
+                    let promise_thumbs = req.files.forEach(file => {
                         let outputFile = "thumb-" + Date.now() + file.originalname;
-                        sharp(file.path).resize({ width: 120 }).toFile(outputFile)
+                        sharp(file.path).resize({ width: 100 }).toFile(outputFile)
                         .then(function(newFileInfo) {
                             newFileInfo.path = outputFile;
                             console.log('Now we handle to upload:',newFileInfo);
@@ -198,8 +198,15 @@ router.post('/uploadImgsToBank',function(req,res){
                             if(config.testingData){ console.log("Error occured when resizing img",err) };
                             return res.status(500).send({ status: 'failed', message: err });
                         });
-                        return res.status(200).send({ status: 'sucess', result: thumbImagesUploaded });
                     });
+                    Promise.all(promise_thumbs)
+                    .then(resultThumbs => {
+                        if(config.testingData){ console.log('Thumbs created Successfully');}
+                        return res.status(200).send({ status: 'sucess', result: thumbImagesUploaded });
+                    }).catch(error => {
+                        if(config.testingData){ console.log('Error creating/uploading thumbs',error)};
+                        return res.status(500).send({ status: 'failed', message: error });
+                    })
                     // todo and move the create process to it own function and pass the req + thumbImagesUploaded.
                 }else{
                     // todo and move the create process to it own function and pass just the req.

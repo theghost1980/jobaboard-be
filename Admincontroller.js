@@ -159,8 +159,7 @@ router.post('/deleteImgOnBank',function(req,res){
 router.post('/uploadImgsToBank',function(req,res){
     const token = req.headers['x-access-token'];
     const thumbs = req.headers['createthumbs']; //as 'true' or 'false'
-    return console.log(req.headers);
-    
+    if(config.testingData){ console.log(req.headers) };
     var thumbImagesUploaded = [];
     //TODO check if userType = 'admin'
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -173,7 +172,7 @@ router.post('/uploadImgsToBank',function(req,res){
                     console.log('Err Uploading Multiple Images.',err);
                     return res.status({ status: 'failed', message: err });
                 }
-                if(thumbs === 'true' || thumbs === true){
+                if(thumbs === 'true' || thumbs === "true"){
                     if(config.testingData) { console.log('Creating thumbs as requested!!!')};
                     req.files.forEach(file => {
                         let outputFile = "thumb-" + Date.now() + file.originalname;

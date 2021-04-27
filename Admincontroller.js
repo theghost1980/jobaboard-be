@@ -195,77 +195,64 @@ router.post('/uploadImgsToBank',function(req,res){
                     Promise.all(promise_thumbs)
                     .then(result => { //result is the array holding the thumb images as we need them.
                         const thumbImages = result;
-                        return res.status(200).send({ status: 'sucess', result: thumbImages }); //sent for now as created thumbs + uploaded
-                        
+                        //from here we can call create on mongoDB passing req,thumbImages.
+                        // return res.status(200).send({ status: 'sucess', result: thumbImages }); //sent for now as created thumbs + uploaded
+                        saveData(req,thumbImages);
                     }).catch((error) => {
                         if(config.testingData){ console.log('Error creating/uploading the thumbs.',error)}
                         return res.status(500).send({'status': 'failed', 'message': error})
                     });
-                    
-                    return console.log('Done until here for now, TODO: the save into mongoDB function separate bellow!!!');
-                    // let promise_thumbs = req.files.map(file => new Promise((resolve,reject) => {
-                    //     let outputFile = "thumb-" + Date.now() + file.originalname;
-                    //     sharp(file.path).resize({ width: 100 }).toFile(outputFile)
-                    //     .then(function(newFileInfo) {
-                    //         newFileInfo.path = outputFile;
-                    //         console.log('Now we handle to upload:',newFileInfo);
-                    //         cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JABImageThumb'}, function(error, thumbUploaded){
-                    //             if(error){ console.log('Error uploading thumb.')}
-                    //             thumbImagesUploaded.push(thumbUploaded.secure_url);
-                    //             if(config.testingData){
-                    //                 console.log('Thumb uploaded.');
-                    //                 console.log(thumbUploaded);
-                    //             }
-                    //             fs.unlink(newFileInfo.path, resultHandler); // now delete the thumb files from local storage to prevent over files flow.
-                    //         });
-                    //     })
-                    //     .catch(function(err) {
-                    //         if(config.testingData){ console.log("Error occured when resizing img",err) };
-                    //         return res.status(500).send({ status: 'failed', message: err });
-                    //     });
-                    // });
-                    // todo and move the create process to it own function and pass the req + thumbImagesUploaded.
                 }else{
                     // todo and move the create process to it own function and pass just the req.
-                    return res.status(404).send({ status: 'failed', message: 'Still need to improve this router!'});
+                    saveData(req,null);
                 }
                 //stoping until here for testing the thumbs processing
-                let res_promises = req.files.map(file => new Promise((resolve,reject) => {
-                    cloudinary.uploader.upload(file.path,{ tags: JSON.parse(req.body.tags)}, function(err, image){
-                        if(err) reject(err) 
-                        else {
-                            resolve(image.secure_url);
-                            fs.unlink(file.path, resultHandler);
-                        }
-                    })
-                }))
-                Promise.all(res_promises)
-                .then(result => { //result is the array holding the images as we need them.
-                    const images = result;
-                    if(config.testingData){ console.log('To save:',images)};
-                    //at this point if we have thumbImages !== null then we use them.
-                    let save_promises = images.map(image => new Promise((resolve,reject) => {
-                        Img.create({ image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}, function(err,createdImg){
-                            if(err) reject(err) 
-                            else {
-                                resolve(createdImg);
-                            }
-                        })
-                    }))
-                    Promise.all(save_promises)
-                    .then(result =>{//result is the array holding the images as we need them.
-                        if(config.testingData){ console.log('Created new images:', result)};
-                        return res.status(200).send({ status: 'sucess', result: result }) //sucess
-                    })
-                    .catch((error) => { res.status(500).send({'status': 'failed', 'message': error})});
-                })
-                .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
+                //moved as a function bellow but inside the router.
             });
             //END cloudinary loop
         }else{
             return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
         }
     });
+    //handle to save into mongoDB
+    function saveData(req,thumbImages){
+        if(config.testingData){
+            console.log(thumbImages ? 'we have thumbs' : 'no thumbs received!');
+            if(thumbImages) { console.log(thumbImages)};
+        }
+        let res_promises = req.files.map(file => new Promise((resolve,reject) => {
+            cloudinary.uploader.upload(file.path,{ tags: JSON.parse(req.body.tags)}, function(err, image){
+                if(err) reject(err) 
+                else {
+                    resolve(image.secure_url);
+                    fs.unlink(file.path, resultHandler);
+                }
+            })
+        }))
+        Promise.all(res_promises)
+        .then(result => { //result is the array holding the images as we need them.
+            const images = result;
+            if(config.testingData){ console.log('To save:',images)};
+            //at this point if we have thumbImages !== null then we use them.
+            let save_promises = images.map((image, index) => new Promise((resolve,reject) => {
+                const imgRecord = !thumbImages ? { image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags)}
+                                                : { image: image, title: req.body.title, createdAt: req.body.createdAt, relatedTo: JSON.parse(req.body.relatedTo), tags: JSON.parse(req.body.tags), thumb: thumbImages[index] }
+                Img.create(imgRecord, function(err,createdImg){
+                    if(err) reject(err) 
+                    else {
+                        resolve(createdImg);
+                    }
+                })
+            }))
+            Promise.all(save_promises)
+            .then(result =>{//result is the array holding the images as we need them.
+                if(config.testingData){ console.log('Created new images:', result)};
+                return res.status(200).send({ status: 'sucess', result: result }) //sucess
+            })
+            .catch((error) => { res.status(500).send({'status': 'failed', 'message': error})});
+        })
+        .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
+    }
 });
 //////END Special sections a upload images into Images Bank for the blog
 

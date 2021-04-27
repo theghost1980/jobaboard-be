@@ -162,7 +162,6 @@ router.post('/uploadImgsToBank',function(req,res){
     if(config.testingData){ 
         console.log(req.headers);
         console.log(`thumbs: ${thumbs}`);
-        console.log(`typeof thumbs: ${typeof thumbs}`);
     };
     var thumbImagesUploaded = [];
     //TODO check if userType = 'admin'
@@ -178,35 +177,43 @@ router.post('/uploadImgsToBank',function(req,res){
                 }
                 if(thumbs === 'true' || thumbs === "true"){
                     if(config.testingData) { console.log('Creating thumbs as requested!!!')};
-                    let promise_thumbs = req.files.forEach(file => {
+                    let promise_thumbs = req.files.map(file => new Promise((resolve,reject) => {
                         let outputFile = "thumb-" + Date.now() + file.originalname;
                         sharp(file.path).resize({ width: 100 }).toFile(outputFile)
                         .then(function(newFileInfo) {
                             newFileInfo.path = outputFile;
-                            console.log('Now we handle to upload:',newFileInfo);
-                            cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JABImageThumb'}, function(error, thumbUploaded){
-                                if(error){ console.log('Error uploading thumb.')}
-                                thumbImagesUploaded.push(thumbUploaded.secure_url);
-                                if(config.testingData){
-                                    console.log('Thumb uploaded.');
-                                    console.log(thumbUploaded);
-                                }
-                                fs.unlink(newFileInfo.path, resultHandler); // now delete the thumb files from local storage to prevent over files flow.
-                            });
+                            resolve(newFileInfo.path);
+                            fs.unlink(newFileInfo.path, resultHandler);
                         })
-                        .catch(function(err) {
-                            if(config.testingData){ console.log("Error occured when resizing img",err) };
-                            return res.status(500).send({ status: 'failed', message: err });
-                        });
-                    });
+                        .catch(err => reject(err));
+                    }));
                     Promise.all(promise_thumbs)
-                    .then(resultThumbs => {
-                        if(config.testingData){ console.log('Thumbs created Successfully');}
-                        return res.status(200).send({ status: 'sucess', result: thumbImagesUploaded });
-                    }).catch(error => {
-                        if(config.testingData){ console.log('Error creating/uploading thumbs',error)};
-                        return res.status(500).send({ status: 'failed', message: error });
-                    })
+                    .then(result => { //result is the array holding the thumb images as we need them.
+                        const thumbImages = result;
+                        return res.status(200).send({ status: 'sucess', result: thumbImages });
+                    }).catch((error) => { res.status(500).send({'status': 'failed', 'message': error})});
+
+                    // let promise_thumbs = req.files.map(file => new Promise((resolve,reject) => {
+                    //     let outputFile = "thumb-" + Date.now() + file.originalname;
+                    //     sharp(file.path).resize({ width: 100 }).toFile(outputFile)
+                    //     .then(function(newFileInfo) {
+                    //         newFileInfo.path = outputFile;
+                    //         console.log('Now we handle to upload:',newFileInfo);
+                    //         cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JABImageThumb'}, function(error, thumbUploaded){
+                    //             if(error){ console.log('Error uploading thumb.')}
+                    //             thumbImagesUploaded.push(thumbUploaded.secure_url);
+                    //             if(config.testingData){
+                    //                 console.log('Thumb uploaded.');
+                    //                 console.log(thumbUploaded);
+                    //             }
+                    //             fs.unlink(newFileInfo.path, resultHandler); // now delete the thumb files from local storage to prevent over files flow.
+                    //         });
+                    //     })
+                    //     .catch(function(err) {
+                    //         if(config.testingData){ console.log("Error occured when resizing img",err) };
+                    //         return res.status(500).send({ status: 'failed', message: err });
+                    //     });
+                    // });
                     // todo and move the create process to it own function and pass the req + thumbImagesUploaded.
                 }else{
                     // todo and move the create process to it own function and pass just the req.

@@ -182,17 +182,27 @@ router.post('/uploadImgsToBank',function(req,res){
                         sharp(file.path).resize({ width: 100 }).toFile(outputFile)
                         .then(function(newFileInfo) {
                             newFileInfo.path = outputFile;
-                            resolve(newFileInfo.path);
-                            fs.unlink(newFileInfo.path, resultHandler);
+                            cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JAB-thumbs'}, function(err, image){
+                                if(err) reject(err) 
+                                else {
+                                    resolve(image.secure_url);
+                                    fs.unlink(newFileInfo.path, resultHandler);
+                                }
+                            })
                         })
                         .catch(err => reject(err));
                     }));
                     Promise.all(promise_thumbs)
                     .then(result => { //result is the array holding the thumb images as we need them.
                         const thumbImages = result;
-                        return res.status(200).send({ status: 'sucess', result: thumbImages });
-                    }).catch((error) => { res.status(500).send({'status': 'failed', 'message': error})});
-
+                        return res.status(200).send({ status: 'sucess', result: thumbImages }); //sent for now as created thumbs + uploaded
+                        
+                    }).catch((error) => {
+                        if(config.testingData){ console.log('Error creating/uploading the thumbs.',error)}
+                        return res.status(500).send({'status': 'failed', 'message': error})
+                    });
+                    
+                    return console.log('Done until here for now, TODO: the save into mongoDB function separate bellow!!!');
                     // let promise_thumbs = req.files.map(file => new Promise((resolve,reject) => {
                     //     let outputFile = "thumb-" + Date.now() + file.originalname;
                     //     sharp(file.path).resize({ width: 100 }).toFile(outputFile)

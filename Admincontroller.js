@@ -182,8 +182,8 @@ router.post('/uploadImgsToBank',function(req,res){
                             cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JABImageThumb'}, function(error, thumbUploaded){
                                 if(error){ console.log('Error uploading thumb.')}
                                 thumbImagesUploaded.push(thumbUploaded.secure_url);
-                                console.log(`Thumb uploaded. ${thumb}`);
-                                fs.unlink(newFileInfo.path, resultHandler); // now delete the files from local storage.
+                                console.log(`Thumb uploaded. ${thumbUploaded}`);
+                                fs.unlink(newFileInfo.path, resultHandler); // now delete the thumb files from local storage to prevent over files flow.
                             });
                         })
                         .catch(function(err) {

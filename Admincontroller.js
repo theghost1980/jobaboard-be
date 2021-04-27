@@ -159,7 +159,11 @@ router.post('/deleteImgOnBank',function(req,res){
 router.post('/uploadImgsToBank',function(req,res){
     const token = req.headers['x-access-token'];
     const thumbs = req.headers['createthumbs']; //as 'true' or 'false'
-    if(config.testingData){ console.log(req.headers) };
+    if(config.testingData){ 
+        console.log(req.headers);
+        console.log(`thumbs: ${thumbs}`);
+        console.log(`typeof thumbs: ${typeof thumbs}`);
+    };
     var thumbImagesUploaded = [];
     //TODO check if userType = 'admin'
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -183,7 +187,10 @@ router.post('/uploadImgsToBank',function(req,res){
                             cloudinary.uploader.upload(newFileInfo.path,{ tags: 'JABImageThumb'}, function(error, thumbUploaded){
                                 if(error){ console.log('Error uploading thumb.')}
                                 thumbImagesUploaded.push(thumbUploaded.secure_url);
-                                console.log(`Thumb uploaded. ${thumbUploaded}`);
+                                if(config.testingData){
+                                    console.log('Thumb uploaded.');
+                                    console.log(thumbUploaded);
+                                }
                                 fs.unlink(newFileInfo.path, resultHandler); // now delete the thumb files from local storage to prevent over files flow.
                             });
                         })
@@ -191,8 +198,8 @@ router.post('/uploadImgsToBank',function(req,res){
                             if(config.testingData){ console.log("Error occured when resizing img",err) };
                             return res.status(500).send({ status: 'failed', message: err });
                         });
+                        return res.status(200).send({ status: 'sucess', result: thumbImagesUploaded });
                     });
-                    return res.status(200).send({ status: 'sucess', result: thumbImagesUploaded });
                     // todo and move the create process to it own function and pass the req + thumbImagesUploaded.
                 }else{
                     // todo and move the create process to it own function and pass just the req.

@@ -203,7 +203,7 @@ router.post('/castNfts', function(req,res){
                 id: 'ssc-testNettheghost1980',
                 json: JSON.stringify(json),
                 required_auths: ['jobaboard'],
-                required_posting_auths: [],
+                required_posting_auths: ['posting'],
             };
             if(config.testingData){
                 console.log('Ready to send:',data);

@@ -16,6 +16,9 @@ const dhive = require("@hiveio/dhive");
 const client = new dhive.Client([ "https://api.hive.blog", "https://api.hivekings.com", "https://anyx.io", "https://api.openhive.network","https://hived.privex.io/"]);
 const activeKey = dhive.PrivateKey.fromString(config.active_key);
 
+//using multer to manipulate the formdata
+const multer = require('multer');
+const uploadMultiple = multer().array("file");
 // TODO very important:
 // fix the vulnerability of axios on sscjs
 
@@ -166,6 +169,24 @@ router.get('/findNFT', function(req, res){
     });
 });
 
+///////////////////////////////Handling NFT creation/instantiation/transfer/burn ////////////////////////
+//as we must use BEE to instantiate and tocreate, @jobaboard will be on charge on this 2 from BE side.
+router.post('/createNFT',function(req,res){
+    const token = req.headers['x-access-token'];
+    //create the token, instantiate 1, then transferownership to user + transfer instance, then add it to mongoDB + update user.nft, return sucess results to user.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            uploadMultiple(req,res, function(err){
+                if(config.testingData){ console.log('Reading body as:',req.body)}
+                
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+})
 ///////New routes to handle the instantiation to do after a successfull order was made
 router.post('/castNfts', function(req,res){
     if(config.testingData){ console.log(req.headers)};
@@ -209,18 +230,24 @@ router.post('/castNfts', function(req,res){
                 console.log('Ready to send:',data);
             }
             client.broadcast.json(data, activeKey) //broadcast the instantation
-            .then( result => {
+            .then(result => {
                 //testing just to add to holdings the new symbol on this user
                 User.findOneAndUpdate( { username: pToprocess.to }, { $push: { holding: pToprocess.symbol } }, { new: true }, function(err, updated){
                     if(err){
                         console.log('Error on mongoDB field update.',err);
+                        // TODO create new notification about: 'while ... we got an error, we will reviewing this soon'
+                        // TODO send this to OPLogger
                         return res.status(500).send({ status: 'error', error: err});
                     }
                     console.log('Updated as:',updated);
+                    // TODO create new notification using the info we have, time, from, to, order id, symbol. amount, etc.
+                    // TODO send this to OPLogger
                     return res.status(200).send({ status: 'sucess', updated: updated, result: result});
                 });
             }).catch(error => {
                 console.log('Error while instantiation.',error);
+                // TODO create new notification about: 'while ... we got an error, we will reviewing this soon'
+                // TODO send this to OPLogger
                 return res.status(500).send({ status: 'failed', message: error});
             });
         }else{
@@ -229,5 +256,6 @@ router.post('/castNfts', function(req,res){
     });
 });
 ////////////////////////////////
+///////////////////////////////END Handling NFT creation/instantiation/transfer/burn ////////////////////////
 
 module.exports = router;

@@ -1,10 +1,9 @@
 var mongoose = require('mongoose');
 const config = require('./config');
 // Some notes
-// when the user send a creation of token:
-// 1.   we find for symbol, if not exists locked the symbol, lwc & username.
-//      if exists, return message to user as name taken, refresh nft names.
-// 2.   after created success, change state lwc. Done.
+// I will handle for now this table as the main definitions that we get when we create a token
+// The price here is the price to sell this definition inside JAB. Selling = transferOwnership.
+// This tokens will appear as golden ones on user's token.
 var NFTSchema = new mongoose.Schema({
     nft_id: { 
         type: Number,
@@ -20,10 +19,6 @@ var NFTSchema = new mongoose.Schema({
         default: config.miniLogoDefault,
     },
     price: Number, //set by user for now NTF/HIVE(means hive as the token set in configuration on NFT creation token & fee)
-    // locked_while_creating: { //this field will be set as soon as the user start the creation so we can be sure no one else take this symbol during the process. After finished will toogle.
-    //     type: Boolean,
-    //     default: true,
-    // }, 
     symbol: String,
     name: String,
     orgName: String,

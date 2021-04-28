@@ -177,45 +177,45 @@ router.post('/castNfts', function(req,res){
         if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             const pToprocess = JSON.parse(toprocess);
-            return null //for now testing until here...
             // const posting_key = config.posting_key;
             if(config.testingData){ console.log('About to process',pToprocess)};
-                const feeSymbol = "BEE";
-                const arrayJson = []; 
-                for(let i = 0; i < pToprocess.amount ; i++){
-                    const payload = {
-                        "fromType": "user",
-                        "symbol": String(_newNFT.symbol),
-                        "to": pToprocess.to,
-                        "feeSymbol": feeSymbol,
-                    }
-                    arrayJson.push(payload);
+            return null //for now testing until here...
+            const feeSymbol = "BEE";
+            const arrayJson = []; 
+            for(let i = 0; i < pToprocess.amount ; i++){
+                const payload = {
+                    "fromType": "user",
+                    "symbol": String(_newNFT.symbol),
+                    "to": pToprocess.to,
+                    "feeSymbol": feeSymbol,
                 }
-                const json = {
-                    "contractName": "nft",
-                    "contractAction": "issueMultiple",
-                    "contractPayload": {
-                        "instances": [...arrayJson]
-                    },
-                };
-                // TODO: after beta/tests we move the .env var
-                // ssc_node from the test node to the main hive.
-                const data = {
-                    id: config.SSC_node,
-                    json: JSON.stringify(json),
-                    required_auths: ['jobaboard'],
-                    required_posting_auths: [],
-                };
-                console.log('Ready to send::::::::::');
-                console.log(data);
-                //broadcast the instantation
-                client.broadcast.json(data, config.posting_key)
-                .then( result => {
-                    return res.status(200).send({ status: 'sucess', result: result });
-                }).catch(error => {
-                    console.log('Error while instantiation.',error);
-                    return res.status(500).send({ status: 'failed', message: error});
-                });
+                arrayJson.push(payload);
+            }
+            const json = {
+                "contractName": "nft",
+                "contractAction": "issueMultiple",
+                "contractPayload": {
+                    "instances": [...arrayJson]
+                },
+            };
+            // TODO: after beta/tests we move the .env var
+            // ssc_node from the test node to the main hive.
+            const data = {
+                id: config.SSC_node,
+                json: JSON.stringify(json),
+                required_auths: ['jobaboard'],
+                required_posting_auths: [],
+            };
+            console.log('Ready to send::::::::::');
+            console.log(data);
+            //broadcast the instantation
+            client.broadcast.json(data, config.posting_key)
+            .then( result => {
+                return res.status(200).send({ status: 'sucess', result: result });
+            }).catch(error => {
+                console.log('Error while instantiation.',error);
+                return res.status(500).send({ status: 'failed', message: error});
+            });
         }else{
             return res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
         }

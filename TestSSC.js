@@ -209,7 +209,8 @@ router.post('/castNfts', function(req,res){
             if(config.testingData){
                 console.log('Ready to send:',data);
             }
-            client.broadcast.json(data, config.posting_key) //broadcast the instantation
+            const key = config.posting_key;
+            client.broadcast.json(data, key) //broadcast the instantation
             .then( result => {
                 return res.status(200).send({ status: 'sucess', result: result });
             }).catch(error => {

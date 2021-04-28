@@ -22,4 +22,5 @@ module.exports = {
     'ordersEP': process.env.orders_EP,
     'SSC_main': process.env.ssc_node_main,
     'posting_key': process.env.posting_key,
+    'active_key': process.env.active_key,
 }

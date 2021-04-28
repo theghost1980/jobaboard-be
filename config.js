@@ -21,4 +21,5 @@ module.exports = {
     'handleNFTEP': process.env.handleNFT_EP,
     'ordersEP': process.env.orders_EP,
     'SSC_main': process.env.ssc_node_main,
+    'posting_key': process.env.posting_key,
 }

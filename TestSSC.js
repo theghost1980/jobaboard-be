@@ -179,7 +179,6 @@ router.post('/castNfts', function(req,res){
             const pToprocess = JSON.parse(toprocess);
             // const posting_key = config.posting_key;
             if(config.testingData){ console.log('About to process',pToprocess)};
-            return null //for now testing until here...
             const feeSymbol = "BEE";
             const arrayJson = []; 
             for(let i = 0; i < pToprocess.amount ; i++){
@@ -208,6 +207,7 @@ router.post('/castNfts', function(req,res){
             };
             console.log('Ready to send::::::::::');
             console.log(data);
+            return null //for now testing until here...
             //broadcast the instantation
             client.broadcast.json(data, config.posting_key)
             .then( result => {

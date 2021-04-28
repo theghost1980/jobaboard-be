@@ -170,7 +170,7 @@ router.get('/findNFT', function(req, res){
 router.post('/castNfts', function(req,res){
     if(config.testingData){ console.log(req.headers)};
     const token = req.headers['x-access-token'];
-    const toprocess = req.headers['toprocess']; //query stringified as { from: '', to: '', nft_id: 0, amount: 0, order_id: ''}
+    const toprocess = req.headers['toprocess']; //query stringified as { from: '', to: '', nft_id: 0, symbol: '', amount: 0, order_id: ''}
     if(!toprocess) return res.status(404).send({ status: 'failed', message: 'No toProcess query provided!' });
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
@@ -184,7 +184,7 @@ router.post('/castNfts', function(req,res){
             for(let i = 0; i < pToprocess.amount ; i++){
                 const payload = {
                     "fromType": "user",
-                    "symbol": String(_newNFT.symbol),
+                    "symbol": String(pToprocess.symbol),
                     "to": pToprocess.to,
                     "feeSymbol": feeSymbol,
                 }

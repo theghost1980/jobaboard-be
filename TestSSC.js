@@ -198,9 +198,10 @@ router.post('/castNfts', function(req,res){
                 },
             };
             // TODO: after beta/tests we move the .env var
-            // ssc_node from the test node to the main hive.
+            // ssc-testNettheghost1980 from the test node to the main hive.
+            // and add to .env var
             const data = {
-                id: config.SSC_node,
+                id: 'ssc-testNettheghost1980',
                 json: JSON.stringify(json),
                 required_auths: ['jobaboard'],
                 required_posting_auths: [],

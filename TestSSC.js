@@ -205,11 +205,10 @@ router.post('/castNfts', function(req,res){
                 required_auths: ['jobaboard'],
                 required_posting_auths: [],
             };
-            console.log('Ready to send::::::::::');
-            console.log(data);
-            return null //for now testing until here...
-            //broadcast the instantation
-            client.broadcast.json(data, config.posting_key)
+            if(config.testingData){
+                console.log('Ready to send:',data);
+            }
+            client.broadcast.json(data, config.posting_key) //broadcast the instantation
             .then( result => {
                 return res.status(200).send({ status: 'sucess', result: result });
             }).catch(error => {

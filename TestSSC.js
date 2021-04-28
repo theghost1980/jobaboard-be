@@ -14,7 +14,7 @@ const ssc = new SSC(config.SSC_node);
 //dhive to test the broadcast of a custom json
 const dhive = require("@hiveio/dhive");
 const client = new dhive.Client([ "https://api.hive.blog", "https://api.hivekings.com", "https://anyx.io", "https://api.openhive.network","https://hived.privex.io/"]);
-
+const postingKey = dhive.PrivateKey.fromString(config.posting_key);
 
 // TODO very important:
 // fix the vulnerability of axios on sscjs
@@ -177,7 +177,6 @@ router.post('/castNfts', function(req,res){
         if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             const pToprocess = JSON.parse(toprocess);
-            // const posting_key = config.posting_key;
             if(config.testingData){ console.log('About to process',pToprocess)};
             const feeSymbol = "BEE";
             const arrayJson = []; 
@@ -209,8 +208,7 @@ router.post('/castNfts', function(req,res){
             if(config.testingData){
                 console.log('Ready to send:',data);
             }
-            const key = config.posting_key;
-            client.broadcast.json(data, key) //broadcast the instantation
+            client.broadcast.json(data, postingKey) //broadcast the instantation
             .then( result => {
                 return res.status(200).send({ status: 'sucess', result: result });
             }).catch(error => {

@@ -168,6 +168,7 @@ router.get('/findNFT', function(req, res){
 
 ///////New routes to handle the instantiation to do after a successfull order was made
 router.post('/castNfts', function(req,res){
+    if(config.testingData){ console.log(req.headers)};
     const token = req.headers['x-access-token'];
     const toprocess = req.headers['toprocess']; //query stringified as { from: '', to: '', nft_id: 0, amount: 0, order_id: ''}
     if(!toprocess) return res.status(404).send({ status: 'failed', message: 'No toProcess query provided!' });

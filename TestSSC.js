@@ -210,7 +210,15 @@ router.post('/castNfts', function(req,res){
             }
             client.broadcast.json(data, activeKey) //broadcast the instantation
             .then( result => {
-                return res.status(200).send({ status: 'sucess', result: result });
+                //testing just to add to holdings the new symbol on this user
+                User.findOneAndUpdate( { username: pToprocess.to }, { $push: { holding: pToprocess.symbol } }, { new: true }, function(err, updated){
+                    if(err){
+                        console.log('Error on mongoDB field update.',err);
+                        return res.status(500).send({ status: 'error', error: err});
+                    }
+                    console.log('Updated as:',updated);
+                    return res.status(200).send({ status: 'sucess', updated: updated, result: result});
+                });
             }).catch(error => {
                 console.log('Error while instantiation.',error);
                 return res.status(500).send({ status: 'failed', message: error});

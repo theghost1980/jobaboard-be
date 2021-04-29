@@ -147,6 +147,7 @@ router.post('/uploadIcon', async function(req,res){
 ///////add new instance after creation of nft
 router.post('/addNftInstance',function(req,res){
     const token = req.headers['x-access-token'];
+    const insertmany = req.headers['insertmany'];
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -160,13 +161,25 @@ router.post('/addNftInstance',function(req,res){
                     return res.status(200).send({ status: 'contactDev', message: 'For now we are not handling images on instances.'})
                 }else{
                     if(config.testingData){ console.log('About to save:', req.body)}
-                    Nft_user.create(req.body, function(err, newNft){
-                        if(err){
-                            if(config.testingData){ console.log('Error when creating NFT', err)};
-                            return res.status(500).send({ status: 'failed', message: err});
-                        }
-                        return res.status(200).send({ status: 'sucess', result: newNft });
-                    })
+                    if(insertmany){
+                        const dataArray = JSON.parse(req.body['nfts']);
+                        if(config.testingData){ console.log('About to save:', dataArray)};
+                        Nft_user.insertMany(dataArray,function(err,result){
+                            if(err){
+                                if(config.testingData){ console.log('Error adding new instances.',err)};
+                                return res.status(500).send({ status: 'failed', message: err});
+                            }
+                            return res.status(200).send({ status: 'sucess', result: result });
+                        })
+                    }else{
+                        Nft_user.create(req.body, function(err, newNft){
+                            if(err){
+                                if(config.testingData){ console.log('Error when creating NFT', err)};
+                                return res.status(500).send({ status: 'failed', message: err});
+                            }
+                            return res.status(200).send({ status: 'sucess', result: newNft });
+                        });
+                    }
                 }
             })
         }else{

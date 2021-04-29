@@ -307,6 +307,34 @@ router.post('/updateNFTfield', function(req,res){
     });
 });
 
+///update instances field(s)
+router.post('/updateInstanceNFTfield', function(req,res){
+    const token = req.headers['x-access-token'];
+    const nft_instance_id = req.headers['nft_instance_id'];
+    const query = req.headers['query'];
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty query has been made!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }else{
+        console.log('To modify fields:',jsonQuery);
+    };
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            Nft_user.findOneAndUpdate({ nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
+                if(err){
+                    console.log('Error trying to update the Nft',err);
+                    return res.status(500).send({ status: 'failed', error: err});
+                }
+                res.status(200).send({ status: 'sucess', result: updated});
+            });
+        }else{
+            res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        }
+    });
+});
 ///get all instances on mongoDB based on query
 router.get('/getNFTInstancesQuery', function(req,res){
     const token = req.headers['x-access-token'];

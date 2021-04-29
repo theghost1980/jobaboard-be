@@ -180,7 +180,8 @@ router.post('/createNFT',function(req,res){
         if(decoded){
             uploadMultiple(req,res, function(err){
                 if(config.testingData){ console.log('Reading body as:',req.body)}
-                
+                // TODO for now let's handle it on client side
+                // later on we will pass it over here if needed.
             });
         }else{
             return res.status(500).send({ auth: false, message: 'Failed to decode token.' });

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var Nft = require('./Nft');
+var Nft_user = require('./Nft_user');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 // const formidable = require('formidable');
@@ -141,6 +142,39 @@ router.post('/uploadIcon', async function(req,res){
 //////////////////
 // todo: erase this testings handling the formdata + upload only 1 image + resize it to create the thumb.
 // const uploadtest = multer({ dest: 'uploads/' }) // to test without storing or saving the image anywhere.
+
+///////////handling nft_user routers
+///////add new instance after creation of nft
+router.post('/addNftInstance',function(req,res){
+    const token = req.headers['x-access-token'];
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            upload(req,res,function(err){
+                if(err){
+                    if(config.testingData){ console.log('Error on multer.',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                if(req.file){
+                    return res.status(200).send({ status: 'contactDev', message: 'For now we are not handling images on instances.'})
+                }else{
+                    if(config.testingData){ console.log('About to save:', req.body)}
+                    Nft_user.create(req.body, function(err, newNft){
+                        if(err){
+                            if(config.testingData){ console.log('Error when creating NFT', err)};
+                            return res.status(500).send({ status: 'failed', message: err});
+                        }
+                        return res.status(200).send({ status: 'sucess', result: newNft });
+                    })
+                }
+            })
+        }else{
+            res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        }
+    });
+});
+///////////end handling nft_user routers
 
 router.post('/addNFTDB', function(req, res){
     const token = req.headers['x-access-token'];

@@ -307,6 +307,47 @@ router.post('/updateNFTfield', function(req,res){
     });
 });
 
+///get all instances on mongoDB based on query
+router.get('/getNFTInstancesQuery', function(req,res){
+    const token = req.headers['x-access-token'];
+    const query = req.headers['query'];
+    const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            const jsonQuery = JSON.parse(query);
+            if(!jsonQuery) {
+                console.log('A null || empty query has been made!');
+                return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+            }
+            //TODO process the query check for nulls || "" and create teh newQuery.
+            const newNode = {};
+            Object.entries(jsonQuery).forEach(([key, val]) => {
+                if(val !== null && val !== ""){
+                    return (newNode[key] = val);
+                }
+            });
+            console.log('New query to process::::');
+            console.log(newNode, `Limit:${limit}`);
+            console.log('Sortby:',sortby);
+            Nft_user.find(newNode,function(err,tokens){
+                if(err){
+                    if(config.testingData){
+                        console.log('Error finding Nft',err);
+                    }
+                    return res.status(500).send({ error: 'Error searching for Nft', message: err});
+                }
+                return res.status(200).send({ status: 'sucess', result: tokens });
+            }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
+
+        }else{
+            res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        }
+    });
+});
+
 //get all token based on query, handling the query on headers.
 router.get('/getNFTquery', function(req,res){
     const token = req.headers['x-access-token'];

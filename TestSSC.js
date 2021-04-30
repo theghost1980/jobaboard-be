@@ -43,7 +43,7 @@ router.get('/allNFTs', function(req, res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //test to make a query to the test node.
-            const _sortby = !sortbyId ? { index: "symbol", descending: false } : {};
+            const _sortby = !sortbyId ? { index: "symbol", descending: false } : null;
             if(config.testingData){ console.log('About to query on:',_sortby)};
 
             ssc.find("nft", "nfts", _query, null, 0, [_sortby], (err, result) => {

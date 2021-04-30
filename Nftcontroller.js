@@ -324,8 +324,11 @@ router.post('/updateNFTfield', function(req,res){
 router.post('/updateInstanceNFTfield', function(req,res){
     const token = req.headers['x-access-token'];
     const nft_instance_id = req.headers['nft_instance_id'];
+    const updatemany = req.headers['updatemany']; // so we can handle one or many record using one router.
     const query = req.headers['query'];
     const jsonQuery = JSON.parse(query);
+    const filter = req.headers['filter']; // json strinfigyed, mandatory to user the updatermany option
+    if(updatemany && !filter){ return res.status(404).send({ status: 'failed', message: 'No filter provided. Filter is mandatory to use the updatermany option'})};
     if(!jsonQuery) {
         console.log('A null || empty query has been made!');
         return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
@@ -336,13 +339,24 @@ router.post('/updateInstanceNFTfield', function(req,res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            Nft_user.findOneAndUpdate({ nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
-                if(err){
-                    console.log('Error trying to update the Nft',err);
-                    return res.status(500).send({ status: 'failed', error: err});
-                }
-                res.status(200).send({ status: 'sucess', result: updated});
-            });
+            if(!insertmany){
+                Nft_user.findOneAndUpdate({ nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
+                    if(err){
+                        console.log('Error trying to update the Nft',err);
+                        return res.status(500).send({ status: 'failed', error: err});
+                    }
+                    res.status(200).send({ status: 'sucess', result: updated});
+                });
+            }else{
+                const pfilter = JSON.parse(filter);
+                Nft_user.updateMany(pfilter, jsonQuery,function(err, result){
+                    if(err){
+                        if(config.testingData){ console.log('Error when updating many instances.',err)};
+                        return res.status(500).send({ status: 'failed', message: err});
+                    }
+                    return res.status(200).send({ status: 'sucess', result: result });
+                });
+            }
         }else{
             res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
         }

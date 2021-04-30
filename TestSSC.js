@@ -44,6 +44,8 @@ router.get('/allNFTs', function(req, res){
         if(decoded){
             //test to make a query to the test node.
             const _sortby = !sortby ? { index: "symbol", descending: false } : JSON.stringify(sortby);
+            if(config.testingData){ console.log('About to query on:',_sortby)};
+            
             ssc.find("nft", "nfts", _query, null, 0, [_sortby], (err, result) => {
                 if(result === null){ return res.status(200).send({ status: 'askAgain'})}
                 if(err){

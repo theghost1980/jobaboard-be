@@ -339,7 +339,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            if(!insertmany){
+            if(!updatemany){
                 Nft_user.findOneAndUpdate({ nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
                     if(err){
                         console.log('Error trying to update the Nft',err);

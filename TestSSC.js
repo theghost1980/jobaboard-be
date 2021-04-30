@@ -32,7 +32,7 @@ router.get('/allNFTs', function(req, res){
     //check for a valid token
     const token = req.headers['x-access-token'];
     const query = req.headers['query']; //format as JSON.stringify(query = {});
-    const sortby = req.headers['sortby']; //Optional as stringifyed i.e { index: "symbol", descending: false }
+    const sortbyId = req.headers['sortbyid']; //Optional as stringifyed i.e { index: "symbol", descending: false }
     // TODO: this parsing has to be inside try/catch and it will serve as another checks on data
     const _query = JSON.parse(query);
     
@@ -43,9 +43,9 @@ router.get('/allNFTs', function(req, res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //test to make a query to the test node.
-            const _sortby = !sortby ? { index: "symbol", descending: false } : JSON.stringify(sortby);
+            const _sortby = !sortbyId ? { index: "symbol", descending: false } : {};
             if(config.testingData){ console.log('About to query on:',_sortby)};
-            
+
             ssc.find("nft", "nfts", _query, null, 0, [_sortby], (err, result) => {
                 if(result === null){ return res.status(200).send({ status: 'askAgain'})}
                 if(err){

@@ -6,6 +6,10 @@ var UserSchema = new mongoose.Schema({
     content: String,
     opened: Boolean,
     username: String,
+    user_can_delete:{
+        type: Boolean,
+        default: true,
+    },
 });
 mongoose.model('Notifications',UserSchema);
 

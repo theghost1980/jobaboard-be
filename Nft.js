@@ -30,7 +30,11 @@ var NFTSchema = new mongoose.Schema({
         type: String,
         default:"JAB platform",
     },
-    for_sale: {
+    for_sale: { //just to use inside JAB as this will enable the sale of the definition on JAB which is a transferOwnership
+        type: Boolean,
+        default: false,
+    },
+    market_enabled: { //intended to mark when the use enables the market for this nft definition.
         type: Boolean,
         default: false,
     },

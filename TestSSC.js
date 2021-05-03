@@ -5,6 +5,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
+var Nft_user = require('./Nft_user');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
@@ -236,23 +237,14 @@ router.post('/castNfts', function(req,res){
             }
             client.broadcast.json(data, activeKey) //broadcast the instantation
             .then(result => {
-                //testing just to add to holdings the new symbol on this user
-                User.findOneAndUpdate( { username: pToprocess.to }, { $push: { holding: pToprocess.symbol } }, { new: true }, function(err, updated){
-                    if(err){
-                        console.log('Error on mongoDB field update.',err);
-                        // TODO create new notification about: 'while ... we got an error, we will reviewing this soon'
-                        // TODO send this to OPLogger
-                        return res.status(500).send({ status: 'error', error: err});
-                    }
-                    console.log('Updated as:',updated);
-                    // TODO create new notification using the info we have, time, from, to, order id, symbol. amount, etc.
-                    // TODO send this to OPLogger
-                    return res.status(200).send({ status: 'sucess', updated: updated, result: result});
-                });
+                console.log('Response when broadcast:',result);
+                if(result.id){
+                    getInfoTX(result.id, pToprocess);
+                }else{
+                    //handle error as it must returns an ID as broadcasted.
+                }
             }).catch(error => {
-                console.log('Error while instantiation.',error);
-                // TODO create new notification about: 'while ... we got an error, we will reviewing this soon'
-                // TODO send this to OPLogger
+                console.log('Error while instantiation.',error); // TODO create new notification about: 'while ... we got an error, we will reviewing this soon' // TODO send this to OPLogger
                 return res.status(500).send({ status: 'failed', message: error});
             });
         }else{
@@ -260,6 +252,63 @@ router.post('/castNfts', function(req,res){
         }
     });
 });
+
+//neccessary funtions to use on this controller
+/////check a TX recursive, if not found the tx, ask again as check
+function getInfoTX(tx,toprocess){
+    if(tx){
+        console.log(`Checking on: ${tx}`);
+        ssc.getTransactionInfo(tx, function(err, result){
+            if(result === null){ 
+                console.log('Response while checking on Tx:',result);
+                console.log('askAgain');
+                return setTimeout(getInfoTX(tx,toprocess),3000);
+            }else{
+                if(response.logs){
+                    const logs = JSON.parse(response.logs);
+                    console.log('Now received as response: ',logs);
+                    const tknContracts = logs.events.filter(log => log.contract === "tokens");
+                    const nftContracts = logs.events.filter(log => log.contract === "nft");
+                    // console.log(tknContracts,nftContracts);
+                    if(Number(toprocess.amount) === tknContracts.length && Number(toprocess.amount) === nftContracts.length){
+                        //was succesfull dunno if we must handle in case of an error of issuing less than amount???
+                        console.log(`We casted ${amount} of ${toprocess.symbol} Token(s)`);
+                        //here we save the data into nft_user
+                        const nfts = [];
+                        const arrayEvents = logs.events;
+                        arrayEvents.map(event => {
+                            if(event.event === "issue"){
+                                nfts.push(
+                                    { ntf_id: Number(toprocess.nft_id), ntf_symbol: toprocess.symbol, nft_instance_id: Number(event.data.id), username: toprocess.to, createdAt: new Date()}
+                                )
+                            }
+                        });
+                        console.log('About to save new instances', nfts);
+                        Nft_user.insertMany(nfts,function(err,result){
+                            if(err){
+                                if(config.testingData){ console.log('Error adding new instances.',err)};
+                                return res.status(500).send({ status: 'failed', message: err});
+                            }
+                            //TODO optional: how to handle the notification about this????
+                            return res.status(200).send({ status: 'sucess', result: result });
+                        });
+                    }
+                    if(logs.errors){
+                        //TODO handle the errors
+                        
+                    }
+                }
+            }
+            if(err){
+                if(config.testingData){console.log('Error fetching from RPC API hive.',err);}  
+                return res.status(500).send({ result: 'error', error: err});
+            }
+            // if(config.testingData){console.log(result);}
+            res.status(200).send(result);
+        });
+    }
+}
+//END neccessary functions
 ////////////////////////////////
 ///////////////////////////////END Handling NFT creation/instantiation/transfer/burn ////////////////////////
 

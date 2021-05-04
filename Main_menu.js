@@ -16,6 +16,7 @@ var MainMenuSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    order: Number,
     createdAt: Date,
     updatedAt: Date,
 });

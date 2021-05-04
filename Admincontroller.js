@@ -319,6 +319,35 @@ router.post('/addMmenuJab', function(req,res){
         }
     });
 });
+
+//handle updates/edition on main_menus JAB.
+router.post('/updateMmenuJab', function(req,res){
+    const token = req.headers['x-access-token'];
+    const titlemenu = req.headers['titlemenu']; //must be provided to search first to be sure it doesnt exists.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){ console.log('Trying to Update on Main Menu:', titlemenu)};
+            upload(req, res, function(err){
+                if(err){
+                    if(config.testingData){ console.log('Error processing on multer.',err) };
+                    return res.status(500).send({ status: 'failed', message: err});
+                };
+                if(config.testingData){ console.log('Trying to update:', req.body) };
+                Main_menu.findByIdAndUpdate({ title: titlemenu }, req.body, { new: true }, function(err, updated){
+                    if(err){
+                        if(config.testingData){ console.log('Error trying to update menu.', err) };
+                        return res.status(500).send({ status: 'failed', message: err });
+                    }
+                    return res.status(200).send({ status: 'sucess', result: updated });
+                })
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
 ///////END Main_menu handling CRUD///////
 
 ///////Job sections controlled by Admins

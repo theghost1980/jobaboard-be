@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 var MainMenuSchema = new mongoose.Schema({
-    title: String, 
+    title: {
+        type: String,
+        unique: true,
+    }, 
     inner_link: String, 
     hideOnLoggin: Boolean, 
     link: Boolean,

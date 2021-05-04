@@ -241,6 +241,7 @@ router.post('/castNfts', function(req,res){
                 if(result.id){
                     getInfoTX(result.id, pToprocess);
                 }else{
+                    // TODO
                     //handle error as it must returns an ID as broadcasted.
                 }
             }).catch(error => {

@@ -4,7 +4,17 @@ var MainMenuSchema = new mongoose.Schema({
     inner_link: String, 
     hideOnLoggin: Boolean, 
     link: Boolean,
-    active: Boolean,
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    icon_url: String,
+    show_icon: {
+        type: Boolean,
+        default: false,
+    },
+    createdAt: Date,
+    updatedAt: Date,
 });
 mongoose.model('Main_Menu', MainMenuSchema);
 

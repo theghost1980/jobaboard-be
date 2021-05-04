@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+const Main_menu = require('./Main_menu'); //so the admins can modify on JAB, CRUD this schema.
 const Nft = require('./Nft');
 var Image = require('./Image'); //this one for now do not a controller but can be used anywhere, for now just in admincontroller.
 var Img = require('./Img'); //using this one as it seems when created it prints the first config and cannot change later on
@@ -255,6 +256,36 @@ router.post('/uploadImgsToBank',function(req,res){
     }
 });
 //////END Special sections a upload images into Images Bank for the blog
+
+///////Main_menu handling CRUD///////
+//as a way to start standarization i will use the better approach as used in /getJob using: jwt+filter+limit+sort
+router.get('/getMmenuJab', function(req,res){
+    const token = req.headers['x-access-token'];
+    const filter = JSON.parse(req.headers['filter']) || {}; //if not provided by default brings all.
+    const limit = Number(req.headers['limit']) || 0; //just in case no number comes from request.
+    const sort = JSON.parse(req.headers['sort']) || {}; //as { createdAt: -1 } { field: -1} -1 desc || { field: 1} 1 asc.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){
+                console.log('filtering on Main_Menu AdminController:',filter);
+                console.log('Limit:',limit);
+                console.log('Sort:',sort);
+            }
+            Main_menu.find(filter, function(err, menus){
+                if(err){
+                    if(config.testingData) {console.log('Error finding Main_menu',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: menus });
+            }).sort(sort).limit(limit)
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+///////END Main_menu handling CRUD///////
 
 ///////Job sections controlled by Admins
 ///////////handling job queries from admins

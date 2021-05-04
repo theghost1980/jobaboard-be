@@ -286,7 +286,7 @@ router.get('/getMmenuJab', function(req,res){
     });
 });
 
-router.get('/addMmenuJab', function(req,res){
+router.post('/addMmenuJab', function(req,res){
     const token = req.headers['x-access-token'];
     const titlemenu = req.headers['titlemenu']; //must be provided to search first to be sure it doesnt exists.
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });

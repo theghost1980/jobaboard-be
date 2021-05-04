@@ -335,7 +335,7 @@ router.post('/updateMmenuJab', function(req,res){
                     return res.status(500).send({ status: 'failed', message: err});
                 };
                 if(config.testingData){ console.log('Trying to update:', req.body) };
-                Main_menu.findByIdAndUpdate({ title: titlemenu }, req.body, { new: true }, function(err, updated){
+                Main_menu.findOneAndUpdate({ title: titlemenu }, req.body, { new: true }, function(err, updated){
                     if(err){
                         if(config.testingData){ console.log('Error trying to update menu.', err) };
                         return res.status(500).send({ status: 'failed', message: err });

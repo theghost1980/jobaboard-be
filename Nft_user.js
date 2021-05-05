@@ -8,8 +8,14 @@ var Nft_userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     }, 
-    price: Number, //to be set/updated first on hive, then here. Ideally to handle this only on marketPlace.
-    priceSymbol: String, // defined by system or user, we will see later on.
+    price: { //to be set/updated first on hive, then here. Ideally to handle this only on marketPlace.
+        type: Number,
+        default: 0,
+    }, 
+    priceSymbol: { // defined by system or user, we will see later on.
+        type: String,
+        default: 'notSet',
+    },
     on_sale: {
         type: Boolean,
         default: false,

@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+const Orders = require('./Orders');
 const Main_menu = require('./Main_menu'); //so the admins can modify on JAB, CRUD this schema.
 const Nft = require('./Nft');
 var Image = require('./Image'); //this one for now do not a controller but can be used anywhere, for now just in admincontroller.
@@ -735,5 +736,42 @@ router.get('/getNFTquery', function(req,res){
 ///////End Query NFTs on mongoDB
 /////////END Handling NFTs////////
 
+/////////////////////////////////////////////////
+///////Order section controlled by Admins
+///////////handling Order get from admins
+////Testing how to do a get that can be used in order and another schems at the same time.
+// this can allow us to modify the code and refactor later on.
+router.get('/getRequest', function(req,res){
+    const token = req.headers['x-access-token'];
+    const schema = req.headers['schema']; //defines the schema you want to query as "./Orders", "./Nft", etc.
+    const filter = JSON.parse(req.headers['filter']) || {};
+    const limit = Number(req.headers['limit']) || 0; //just in case no number comes from request.
+    const sort = JSON.parse(req.headers['sort']) || {}; //as { createdAt: -1 } { field: -1} -1 desc || { field: 1} 1 asc.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){
+                console.log(`Checking on ${schema} data by Admin: ${decoded.usernameHive}`);
+                console.log('filtering on jobs AdminController:', filter);
+                console.log('Limit:', limit);
+                console.log('Sort:', sort)
+            }
+            const _Schema = require(schema);
+            _Schema.find(filter, function(err, result){
+                if(err){
+                    if(config.testingData) {console.log(`Error finding ${schema} `, err)};
+                    return res.status(500).send({ status: 'failed', message: err, schema: schema });
+                }
+                return res.status(200).send({ status: 'sucess', result: result, schema: schema });
+            }).sort(sort).limit(limit)
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+///////////END handling order queries from admins
+///////END Order section controlled by Admins
+/////////////////////////////////////////////////
 
 module.exports = router;

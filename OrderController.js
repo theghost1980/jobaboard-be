@@ -363,7 +363,49 @@ router.get('/getOrderquery', function(req,res){
 // 2. I did this order by mistake, I will contact the other part to agree for a refund.
 // 3. The other part told me he/she cannot fullfill this order, so we will adjust the tokens.
 // 4. Other, specify.
-//TODO now.
+router.post('/updateOrderStatus', function(req,res){
+    const token = req.headers['x-access-token'];
+    const status = req.headers['status']; //as "Completed", "Reported", "Cancelled by Employer"
+    const id_order = req.headers['id_order']; //mandatory, send failed if not provided.
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    if(!id_order) return res.status(404).send({ status: 'failed', message: 'No Order_id provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(status === "Completed"){
+                upload(req, res, function(err){
+                    if(err){
+                        console.log('Error processing on multer.',err);
+                        return res.status(500).send({ status: 'failed', message: err});
+                    };
+                    let promise_Update_Order = new Promise((resolve, reject) => {
+                        Order.findByIdAndUpdate(id_order, { status: status }, function(err,updated){
+                            if(err) reject(err);
+                            resolve(updated);
+                        });
+                    });
+                    promise_Update_Order.then(result => {
+                        //now we add the review
+                        if(config.testingData){ console.log(`Making a review on order_id:${id_order}, with data:`, req.body)};
+                        Review.create(req.body, function(err,created){
+                            if(err){
+                                if(config.testingData){ console.log(`Error adding a review for order_id:${id_order}.`, err)};
+                                return res.status(500).send({ status: 'failed', message: err });
+                            }
+                            if(config.testingData){ console.log(`Created a review for order_id:${id_order}.`, created)};
+                            return res.status(200).send({ status: 'sucess', result_review: created, result_order: result });
+                        });
+                    }).catch(error => {
+                        if(config.testingData){ console.log(`Error when updating order_id:${id_order}.`, error)};
+                        return res.status(500).send({ status: 'failed', message: error });
+                    })
+                });
+            }
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
 //END Update the status of an order.
 
 //get all token based on query, handling the query on headers.

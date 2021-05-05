@@ -2,10 +2,12 @@ var mongoose = require('mongoose');
 var OrderSchema = new mongoose.Schema({
     username_employer: String, //the ones who serves the order
     username_employee: String, //the ones who ask this gig/job
-    status: {
+    status: { //"to Complete", "Completed", "Reported", "Cancelled by Employer", "Blocked by Admin", "On Review By System", "Force Terminus"
         type: String,
         default: "to Complete",
     },
+    issue_reason: String,
+    issue_note: String,
     note: String, //used for 'cancellation' or "anything else needed".
     nft_id: Number,
     nft_symbol: String,

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var Order = require('./Orders');
+var Review = require('./Review');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 // const formidable = require('formidable');
@@ -343,6 +344,27 @@ router.get('/getOrderquery', function(req,res){
     });
 });
 //END look up into orders by filter and options
+
+//Update the status of an order as "Completed", "Reported", "Cancelled by Employer"
+// this update is made just by the user who made the order. All the rest is handled in admincontroller.
+// will affect reviews when order is marked as completed.
+//The logic will be: the employer wants to set an order as completed or report.
+// if report must provide a reason from a list select defined on FE.
+// "Reported" reasons.
+// 1. The time is up and I got no results.
+// 2. The other part has miss on completing the order as agreed or miss my notes/specifications.
+// 3. I haven't received the tokens I was promised.
+// 4. Other, specify.
+// "Completed"
+// User must review first and send all the data.
+// we mark the order as completed + append the new review.
+// "Cancelled by Employer"
+// 1. I am aware that cancelling the order before complexion, means I cannot ask for refunds.
+// 2. I did this order by mistake, I will contact the other part to agree for a refund.
+// 3. The other part told me he/she cannot fullfill this order, so we will adjust the tokens.
+// 4. Other, specify.
+//TODO now.
+//END Update the status of an order.
 
 //get all token based on query, handling the query on headers.
 // router.get('/getNFTquery', function(req,res){

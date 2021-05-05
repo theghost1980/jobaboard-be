@@ -18,9 +18,15 @@ var NFTSchema = new mongoose.Schema({
         type: String,
         default: config.miniLogoDefault,
     },
-    price: Number, //set by user for now NTF/HIVE(means hive as the token set in configuration on NFT creation token & fee)
-    price_definition: Number, //the price user defines to sell the ownership of this definition.
-    price_base_on_cast: Number, //this is the price we will use on JAB to buy/sell gigs. Price to be used as in orders.
+    price: Number, //TODO: remove this one.
+    price_definition: {
+        type: Number,
+        default: 0,
+    }, //the price user defines to sell the ownership of this definition.
+    price_base_on_cast: {
+        type: Number,
+        default: 0,
+    }, //this is the price we will use on JAB to buy/sell gigs. Price to be used as in orders.
     symbol: String,
     name: String,
     orgName: String,

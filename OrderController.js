@@ -365,7 +365,7 @@ router.get('/getOrderquery', function(req,res){
 // 4. Other, specify.
 router.post('/updateOrderStatus', function(req,res){
     const token = req.headers['x-access-token'];
-    const status = req.headers['status']; //as "Completed", "Reported", "Cancelled by Employer"
+    const status = req.headers['status']; //"Completed", "Reported", "Cancelled"
     const id_order = req.headers['id_order']; //mandatory, send failed if not provided.
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     if(!id_order) return res.status(404).send({ status: 'failed', message: 'No Order_id provided!' });

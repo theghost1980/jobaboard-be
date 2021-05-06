@@ -54,6 +54,19 @@ router.get('/getActiveJobs', function(req, res){
         });
     }
 })
+router.get('/JobsQuery',function(req,res){
+    const query = JSON.parse(req.headers['query']);
+    const limit = Number(req.headers['limit']) || 0;
+    const sortby = JSON.parse(req.headers['sortby']) || { createdAt: -1 };
+    if(config.testingData){ console.log(`Public query on jobs ${new Date().toLocaleDateString()}`,query) };
+    Job.find(query, function(err, jobs){
+        if(err) {
+            console.log('Error finding jobs',err);
+            return res.status(500).send({ status: 'failed', message: err });
+        }
+        return res.status(200).send({ status: 'sucess', result: jobs});
+    }).sort(sortby).limit(limit)
+});
 ///////////////////////////////////////////////////////////////////////
 
 ////////Public routes for blocks on hive node main

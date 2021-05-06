@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var OrderSchema = new mongoose.Schema({
     username_employer: String, //the ones who serves the order
     username_employee: String, //the ones who ask this gig/job
-    status: { //"to Complete", "Completed", "Reported", "Cancelled by Employer", "Blocked by Admin", "On Review By System", "Force Terminus"
+    status: { //"to Complete", "Completed", "Reported", "Cancelled", "Blocked by Admin", "On Review By System", "Force Terminus"
         type: String,
         default: "to Complete",
     },

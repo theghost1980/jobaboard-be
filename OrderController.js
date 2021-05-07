@@ -380,7 +380,7 @@ router.post('/updateOrderStatus', function(req,res){
                         return res.status(500).send({ status: 'failed', message: err});
                     };
                     let promise_Update_Order = new Promise((resolve, reject) => {
-                        Order.findByIdAndUpdate(id_order, { status: status }, function(err,updated){
+                        Order.findByIdAndUpdate(id_order, { status: status }, { new: true }, function(err,updated){
                             if(err) reject(err);
                             resolve(updated);
                         });

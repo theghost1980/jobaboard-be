@@ -389,8 +389,10 @@ router.post('/updateOrderStatus', function(req,res){
                     });
                     promise_Update_Order.then(result => {
                         //now we add the review
-                        if(config.testingData){ console.log(`Making a review on order_id:${id_order}, with data:`, req.body)};
-                        Review.create(req.body, function(err,created){
+                        const dataReview = req.body;
+                        dataReview['stars_rated'] = JSON.parse(dataReview['stars_rated']);
+                        if(config.testingData){ console.log(`Making a review on order_id:${id_order}, with data:`, dataReview)};
+                        Review.create(dataReview, function(err,created){
                             if(err){
                                 if(config.testingData){ console.log(`Error adding a review for order_id:${id_order}.`, err)};
                                 return res.status(500).send({ status: 'failed', message: err });

@@ -12,6 +12,7 @@ var ReviewSchema = new mongoose.Schema({
     job_title: String,
     category_job: String,
     stars: Number, //as the score the employer gives at complexion.
+    stars_rated: { star: Number, rated: String },
     image_review: String, //if the employer needs to upload an image on work finished.
     comments: String,
     note: String, //maybe to use/view only by admins

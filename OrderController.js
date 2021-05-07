@@ -394,7 +394,7 @@ router.post('/updateOrderStatus', function(req,res){
                                 return res.status(500).send({ status: 'failed', message: err });
                             }
                             if(config.testingData){ console.log(`Created a review for order_id:${id_order}.`, created)};
-                            return res.status(200).send({ status: 'sucess', result_review: created, result_order: result });
+                            return res.status(200).send({ status: 'sucess', message:`Order id ${id_order} status updated to ${status}.`, result_review: created, result_order: result });
                         });
                     }).catch(error => {
                         if(config.testingData){ console.log(`Error when updating order_id:${id_order}.`, error)};

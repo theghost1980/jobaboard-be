@@ -405,6 +405,20 @@ router.post('/updateOrderStatus', function(req,res){
                         return res.status(500).send({ status: 'failed', message: error });
                     })
                 });
+            }else{ //"Reported" || "Cancelled"
+                upload(req, res, function(err){
+                    if(err){
+                        if(config.testingData) { console.log('Error processing on multer.',err) };
+                        return res.status(500).send({ status: 'failed', message: err});
+                    };
+                    Order.findByIdAndUpdate(id_order, req.body, { new: true }, function(err,updated){
+                        if(err){
+                            if(config.testingData) { console.log(`Error Updating order:${id_order}.`,err) };
+                            return res.status(500).send({ status: 'failed', message: err});
+                        };
+                        return res.status(200).send({ status: 'sucess', message:`Order id ${id_order} status updated to ${status}.`, result_order: updated });
+                    });
+                });
             }
         }else{
             return res.status(404).send({ auth: false, message: 'Failed to decode token.' });

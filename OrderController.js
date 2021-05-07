@@ -388,8 +388,7 @@ router.post('/updateOrderStatus', function(req,res){
                         });
                     });
                     promise_Update_Order.then(result => {
-                        //now we add the review
-                        const dataReview = req.body;
+                        const dataReview = req.body; //now we add the review
                         dataReview['stars_rated'] = JSON.parse(dataReview['stars_rated']);
                         if(config.testingData){ console.log(`Making a review on order_id:${id_order}, with data:`, dataReview)};
                         Review.create(dataReview, function(err,created){
@@ -411,7 +410,10 @@ router.post('/updateOrderStatus', function(req,res){
                         if(config.testingData) { console.log('Error processing on multer.',err) };
                         return res.status(500).send({ status: 'failed', message: err});
                     };
-                    Order.findByIdAndUpdate(id_order, req.body, { new: true }, function(err,updated){
+                    const dataOrder = req.body; //now we add the review
+                    dataOrder['status'] = status;
+                    if(config.testingData) { console.log('About to update:', dataOrder)};
+                    Order.findByIdAndUpdate(id_order, dataOrder, { new: true }, function(err,updated){
                         if(err){
                             if(config.testingData) { console.log(`Error Updating order:${id_order}.`,err) };
                             return res.status(500).send({ status: 'failed', message: err});

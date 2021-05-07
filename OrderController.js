@@ -369,6 +369,7 @@ router.post('/updateOrderStatus', function(req,res){
     const id_order = req.headers['id_order']; //mandatory, send failed if not provided.
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     if(!id_order) return res.status(404).send({ status: 'failed', message: 'No Order_id provided!' });
+    if(!status) return res.status(404).send({ status: 'failed', message: 'No status provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){

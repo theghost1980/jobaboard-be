@@ -124,6 +124,7 @@ router.get('/findJabUser', function(req,res){
 // find users per fields so you can bring all those users under this query i.e:
 // for testing leaving with no token access
 router.get('/jabUsersField', function(req,res){
+    const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query =  i.e { following: 1, ... }
     const filter = JSON.parse(req.headers['filter']); //{ username: $in{ ["name1", "name2"]}} 
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });

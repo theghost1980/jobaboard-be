@@ -124,14 +124,12 @@ router.get('/findJabUser', function(req,res){
 // find users per fields so you can bring all those users under this query i.e:
 // for testing leaving with no token access
 router.get('/jabUsersField', function(req,res){
-    // TODO const token = req.headers['x-access-token'];
     const jsonQuery = JSON.parse(req.headers['query']); //as query =  i.e { following: 1, ... }
     const filter = JSON.parse(req.headers['filter']); //{ username: $in{ ["name1", "name2"]}} 
-    // const tolookup = req.headers['tolookup'];
-    // if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
-    // jwt.verify(token, config.secret, function(err, decoded){
-        // if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-        // if(decoded){
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
             console.log('Filter:',filter);
             console.log('Query:',jsonQuery);
             // console.log('decoded.usernameHive:', decoded.usernameHive);
@@ -143,10 +141,10 @@ router.get('/jabUsersField', function(req,res){
                 console.log("Founds:",founds);
                 res.status(200).send({ status: 'sucess', result: founds});
             });
-        // }else{
-            // return res.status(404).send({ auth: false, message: 'Error authenticating token user getUserField.' });
-        // }
-    // });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Error authenticating token user getUserField.' });
+        }
+    });
 });
 
 // Methods to handle following field [String]

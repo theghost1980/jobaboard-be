@@ -326,6 +326,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
     const nft_instance_id = req.headers['nft_instance_id'];
     const ntf_id = req.headers['ntf_id']; //we need both data ntf_id + ntf_instance_id. mandatory to use as a single update.
     const updatemany = req.headers['updatemany']; // so we can handle one or many record using one router.
+    const query = req.headers['query'];
     const jsonQuery = JSON.parse(query);
     const filter = req.headers['filter']; // json strinfigyed, mandatory to user the updatermany option
     if(updatemany && !filter){ return res.status(404).send({ status: 'failed', message: 'No filter provided. Filter is mandatory to use the updatermany option'})};

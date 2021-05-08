@@ -334,7 +334,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
         console.log('A null || empty query has been made!');
         return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
     }else{
-        console.log('To modify fields:',jsonQuery);
+        console.log('To modify fields:',{ jsonQuery: jsonQuery, nft_instance_id: nft_instance_id, ntf_id: ntf_id});
     };
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){

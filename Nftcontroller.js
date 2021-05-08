@@ -324,8 +324,8 @@ router.post('/updateNFTfield', function(req,res){
 router.post('/updateInstanceNFTfield', function(req,res){
     const token = req.headers['x-access-token'];
     const nft_instance_id = req.headers['nft_instance_id'];
+    const ntf_id = req.headers['ntf_id']; //we need both data ntf_id + ntf_instance_id. mandatory to use as a single update.
     const updatemany = req.headers['updatemany']; // so we can handle one or many record using one router.
-    const query = req.headers['query'];
     const jsonQuery = JSON.parse(query);
     const filter = req.headers['filter']; // json strinfigyed, mandatory to user the updatermany option
     if(updatemany && !filter){ return res.status(404).send({ status: 'failed', message: 'No filter provided. Filter is mandatory to use the updatermany option'})};
@@ -340,7 +340,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             if(!updatemany){
-                Nft_user.findOneAndUpdate({ nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
+                Nft_user.findOneAndUpdate({ ntf_id: ntf_id, nft_instance_id: nft_instance_id, username: decoded.usernameHive},jsonQuery,{new: true},function(err,updated){
                     if(err){
                         console.log('Error trying to update the Nft',err);
                         return res.status(500).send({ status: 'failed', error: err});

@@ -65,12 +65,13 @@ router.get('/queryContractTable', function(req,res){
     const query = req.headers['query']; //as { table: '', contract: '', query: {}, limit: 0, offset: 0, indexes: [] };
     const token = req.headers['x-access-token'];
     if(!query) return res.status(404).send({ auth: false, message: 'No query provided!' });
+    const pQuery = JSON.parse(query);
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            if(config.testingData){ console.log('About to process:', query)};
-            ssc.find(query.table, query.contract, query.query, query.limit, query.offset, query.indexes, (err, result) => {
+            if(config.testingData){ console.log('About to process:', pQuery)};
+            ssc.find(pQuery.table, pQuery.contract, pQuery.query, pQuery.limit, pQuery.offset, pQuery.indexes, (err, result) => {
                 if(err){
                     if(config.testingData){ console.log('Error on query:', query) };
                     return res.status(500).send({ status: 'failed', message: err });

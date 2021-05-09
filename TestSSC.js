@@ -60,6 +60,30 @@ router.get('/allNFTs', function(req, res){
     });
 });
 
+//handle queries on specific table > contract
+router.get('/queryContractTable', function(req,res){
+    const query = req.headers['query']; //as { table: '', contract: '', query: {}, limit: 0, offset: 0, indexes: [] };
+    const token = req.headers['x-access-token'];
+    if(!query) return res.status(404).send({ auth: false, message: 'No query provided!' });
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){ console.log('About to process:', query)};
+            ssc.find(query.table, query.contract, query.query, query.limit, query.offset, query.indexes, (err, result) => {
+                if(err){
+                    if(config.testingData){ console.log('Error on query:', query) };
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: result });
+            })
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
+        }
+    });
+});
+//END //handle queries on specific table > contract
+
 //get nft instances of a query
 router.get('/allInstances', function(req, res){
     // console.log(req.params);
@@ -90,6 +114,8 @@ router.get('/allInstances', function(req, res){
                 // if(config.testingData){console.log(result);}
                 res.status(200).send(result);
             });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
         }
     });
 });

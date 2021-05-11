@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var Order = require('./Orders');
+var Order_Market = require('./Orders_Market');
 var Review = require('./Review');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
@@ -429,49 +430,32 @@ router.post('/updateOrderStatus', function(req,res){
 });
 //END Update the status of an order.
 
-//get all token based on query, handling the query on headers.
-// router.get('/getNFTquery', function(req,res){
-//     const token = req.headers['x-access-token'];
-//     const query = req.headers['query'];
-//     const limit = Number(req.headers['limit']);
-//     const sortby = JSON.parse(req.headers['sortby']);
-//     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
-//     jwt.verify(token, config.secret, function(err, decoded){
-//         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-//         if(decoded){
-//             //query = { account: "", nft_id: "", symbol: "", sort: ""} + another params on headers limit: N || 0
-//             // i will handle fields with something or Null.
-//             // on lmit we handle 0 as none.
-//             //process the query too see what fields are on/off and send to mongo
-//             const jsonQuery = JSON.parse(query);
-//             if(!jsonQuery) {
-//                 console.log('A null || empty query has been made!');
-//                 return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
-//             }
-//             //TODO process the query check for nulls || "" and create teh newQuery.
-//             const newNode = {};
-//             Object.entries(jsonQuery).forEach(([key, val]) => {
-//                 if(val !== null && val !== ""){
-//                     return (newNode[key] = val);
-//                 }
-//             });
-//             console.log('New query to process::::');
-//             console.log(newNode, `Limit:${limit}`);
-//             console.log('Sortby:',sortby);
-//             Nft.find(newNode,function(err,tokens){
-//                 if(err){
-//                     if(config.testingData){
-//                         console.log('Error finding Nft',err);
-//                     }
-//                     return res.status(500).send({ error: 'Error searching for Nft', message: err});
-//                 }
-//                 return res.status(200).send({ status: 'sucess', result: tokens });
-//             }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
-
-//         }else{
-//             res.status(404).send({ auth: false, message: 'Failed to decode user!!!.'});
-//         }
-//     });
-// });
+///////Methods to handle Market Orders //////////
+router.post('/createMarketOrder', function(req,res){
+    const token = req.headers['x-access-token'];
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            upload(req,res, function(err){
+                if(err){
+                    if(config.testingData){ console.log('Error on multer', err)};
+                    return res.status(500).send({ status: 'failed', message: err});
+                }
+                if(config.testingData){ console.log('About to create:',req.body)};
+                Order_Market.create(req.body, function(err, newOrder){
+                    if(err){
+                        if(config.testingData){ console.log('Error creating order:', err)};
+                        return res.status(500).send({ status: 'failed', message: err});
+                    }
+                    return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
+                }) ;
+            });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+///////END Methods to handle Market Orders //////////
 
 module.exports = router;

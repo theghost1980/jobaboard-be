@@ -122,6 +122,9 @@ router.post('/checkUser',function(req, res){
     });
 });
 
+//TODO very important on user's login.
+// We must check if the user has image from hive.
+// if does, take that image(somehow) and create a thumb. Add those new 2 images on mongoDB and upload them to cloudinary.
 //new tests based on data from client-gatsby
 router.post('/checkGatsbySig', async function(req, res){
     //dummy image if user not have profileImg set

@@ -126,6 +126,37 @@ router.get('/getNFTquery', function(req,res){
         return res.status(200).send({ status: 'sucess', result: tokens });
     }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
 });
+
+///get all instances on mongoDB based on query
+router.get('/getNFTInstancesQuery', function(req,res){
+    const query = req.headers['query'];
+    const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty public query has been made!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    //TODO process the query check for nulls || "" and create teh newQuery.
+    const newNode = {};
+    Object.entries(jsonQuery).forEach(([key, val]) => {
+        if(val !== null && val !== ""){
+            return (newNode[key] = val);
+        }
+    });
+    console.log('New public query to process::::');
+    console.log(newNode, `Limit:${limit}`);
+    console.log('Sortby:',sortby);
+    Nft_user.find(newNode,function(err,tokens){
+        if(err){
+            if(config.testingData){
+                console.log('Error finding Nft on public query',err);
+            }
+            return res.status(500).send({ error: 'Error searching for Nft', message: err});
+        }
+        return res.status(200).send({ status: 'sucess', result: tokens });
+    }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
+});
 ////////////////////////////////////////////
 
 module.exports = router;

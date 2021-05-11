@@ -7,6 +7,7 @@ var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
 const Nft = require('./Nft');
+const Nft_user = require('./Nft_user');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();

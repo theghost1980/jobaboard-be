@@ -448,15 +448,19 @@ router.post('/createMarketOrder', function(req,res){
                 const item_type = data.item_type;
                 if(config.testingData){ 
                     console.log('item_type:',item_type);
-                    console.log('nft_instances', data.nft_instances);
+                    console.log('original nft_instances', data.nft_instances);
                 };
-                Order_Market.create(req.body, function(err, newOrder){
-                    if(err){
-                        if(config.testingData){ console.log('Error creating order:', err)};
-                        return res.status(500).send({ status: 'failed', message: err});
-                    }
-                    return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
-                }) ;
+                if(item_type === "instance"){
+                    data.nft_instances = JSON.parse(data.nft_instances);
+                    console.log('parsed field: ', data.nft_instances);
+                }
+                // Order_Market.create(req.body, function(err, newOrder){
+                //     if(err){
+                //         if(config.testingData){ console.log('Error creating order:', err)};
+                //         return res.status(500).send({ status: 'failed', message: err});
+                //     }
+                //     return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
+                // }) ;
             });
         }else{
             return res.status(404).send({ auth: false, message: 'Failed to decode token.' });

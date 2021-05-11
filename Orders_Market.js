@@ -10,15 +10,25 @@ var OrderMarketSchema = new mongoose.Schema({
     issue_reason: String, //just used as reported or admins.
     issue_note: String, //just used as reported or admins.
     note: String, ////just used as reported or admins.
-    type: String, //as "definition" or "instance".
-    orderId: Number, //to be used just when type:"instance" as this comes as replay from chain.
-    nft_id: Number,
-    nft_symbol: String,
-    nft_instance_id: Number,
-    amount_nft: { //to be used later on when we enable multiple buy/sellings.
-        type: Number,
-        default: 1,
-    },
+    item_type: String, //"definition" or "instance"
+    orderId: Number, //to be used just when order make on hive market, so we can cancel it.
+    nft_instances: [ //so we can handle i.e, buy of 4 instances with same priceSymbol or n definitions with same priceSymbol.
+        { 
+            symbol: String,
+            nfts: [ Number ], //array of ids.
+            price: Number,
+            priceSymbol: String,
+            fee: Number, 
+        }
+    ],
+    nft_definitions: [
+        {
+            symbol: String,
+            id: Number,
+            price: Number,
+            priceSymbol: Number,
+        }
+    ],
     price_total: Number, //total price on order.
     price_symbol: String, //registers the symbol to pay.
     tx_id: String, //as the txId of this transference when successfull as paid.

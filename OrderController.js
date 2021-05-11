@@ -432,6 +432,7 @@ router.post('/updateOrderStatus', function(req,res){
 
 ///////Methods to handle Market Orders //////////
 router.post('/createMarketOrder', function(req,res){
+    //testing fire another one
     const token = req.headers['x-access-token'];
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){

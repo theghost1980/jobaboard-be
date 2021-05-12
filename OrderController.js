@@ -472,12 +472,14 @@ router.post('/createMarketOrder', function(req,res){
         }
     });
 });
+
 router.get('/getMarketOrder', function(req,res){
     const token = req.headers['x-access-token'];
     const query = req.headers['query'];
     const limit = Number(req.headers['limit']);
     const sortby = JSON.parse(req.headers['sortby']);
     const jsonQuery = JSON.parse(query);
+    if(config.testingData) { console.log(req.headers)};
     if(!jsonQuery) {
         console.log('A null || public empty query has been made on Orders!');
         return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
@@ -485,7 +487,6 @@ router.get('/getMarketOrder', function(req,res){
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-
         if(decoded){
             //TODO process the query check for nulls || "" and create teh newQuery.
             const newNode = {};
@@ -494,14 +495,12 @@ router.get('/getMarketOrder', function(req,res){
                     return (newNode[key] = val);
                 }
             });
-            console.log('New query to process on MarketOrders, user:',decoded.usernameHive);
+            console.log('New query to process on MarketOrders, user:', decoded.usernameHive);
             console.log(newNode, `Limit:${limit}`);
             console.log('Sortby:',sortby);
             Order_Market.find(newNode,function(err,orders){
                 if(err){
-                    if(config.testingData){
-                        console.log('Error finding MarketOrders',err);
-                    }
+                    if(config.testingData){ console.log('Error finding MarketOrders',err) };
                     return res.status(500).send({ status: 'failed', message: err});
                 }
                 return res.status(200).send({ status: 'sucess', result: orders });

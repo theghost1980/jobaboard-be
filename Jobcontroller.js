@@ -128,13 +128,16 @@ router.post('/updateJob', function(req,res){
                     return res.status(500).send({ status: 'failed', message: err });
                 }
                 const data = req.body;
-                if(config.testingData){ console.log('About to update data:', data)};
+                if(config.testingData){ 
+                    console.log('About to update On Job_id:', job_id);
+                    console.log('About to update data:', data);
+                };
                 Job.findByIdAndUpdate(job_id, data, { new: true}, function(err, updated){
                     if(err){
                         if(config.testingData){ console.log('Error updating Job.', err)};
                         return res.status(500).send({ status: 'failed', message: err });
                     }
-                    return res.status(200).send({ status: 'sucess', message: `Job id:${updated._id}`, result: updated });
+                    return res.status(200).send({ status: 'sucess', message: `Job id:${updated._id} Updated Successfully. You can make more great Gigs and services.`, result: updated });
                 });
             });
         }

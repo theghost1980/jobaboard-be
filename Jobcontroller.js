@@ -116,7 +116,9 @@ router.post('/createJob', async function(req,res){
 router.post('/updateJob', function(req,res){
     const token = req.headers['x-access-token'];
     const job_id = req.headers['job_id'];
+    const operation = req.headers['operation']; //as 'edit' || 'delete'
     if(!job_id) return res.status(404).send({status: 'failed', message: 'No Job_ID provided!'});  
+    if(!operation) return res.status(404).send({status: 'failed', message: 'No operation provided!'});
     if(!token) return res.status(404).send({auth: false, message: 'No token provided!'});
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({auth: false,message: 'Failed to authenticate token.'});
@@ -128,18 +130,28 @@ router.post('/updateJob', function(req,res){
                     if(config.testingData){ console.log('Error Multer.', err )};
                     return res.status(500).send({ status: 'failed', message: err });
                 }
-                const data = req.body;
-                if(config.testingData){ 
-                    console.log('About to update On Job_id:', job_id);
-                    console.log('About to update data:', data);
-                };
-                Job.findByIdAndUpdate(job_id, data, { new: true }, function(err, updated){
-                    if(err){
-                        if(config.testingData){ console.log('Error updating Job.', err)};
-                        return res.status(500).send({ status: 'failed', message: err });
-                    }
-                    return res.status(200).send({ status: 'sucess', message: `Job id:${updated._id} Updated Successfully. You can make more great Gigs and services.`, result: updated });
-                });
+                if(operation === 'edit'){
+                    const data = req.body;
+                    if(config.testingData){ 
+                        console.log('About to update On Job_id:', job_id);
+                        console.log('About to update data:', data);
+                    };
+                    Job.findByIdAndUpdate(job_id, data, { new: true }, function(err, updated){
+                        if(err){
+                            if(config.testingData){ console.log('Error updating Job.', err)};
+                            return res.status(500).send({ status: 'failed', message: err });
+                        }
+                        return res.status(200).send({ status: 'sucess', message: `Job id:${updated._id} Updated Successfully. You can make more great Gigs and services.`, result: updated });
+                    });
+                }else if(operation === 'delete'){
+                    Job.findByIdAndDelete(job_id, function(err, response){
+                        if(err){
+                            if(config.testingData){ console.log('Error deleting Job.', err)};
+                            return res.status(500).send({ status: 'failed', message: err });
+                        }
+                        return res.status(200).send({ status: 'sucess', message: `Job id:${job_id} was deleted.`, result: response} );
+                    });
+                }
             });
         }
     });

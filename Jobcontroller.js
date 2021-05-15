@@ -37,7 +37,6 @@ var storage = multer.diskStorage({
     }
 });  
 var upload = multer({ storage: storage }).array("file");
-
 //////to delete the file after sending it to cloud
 const fs = require('fs');
 let resultHandler = function (err) {
@@ -110,7 +109,38 @@ router.post('/createJob', async function(req,res){
             });
         }
     });
+});
+
+///update/edit a job
+router.post('/updateJob', function(req,res){
+    const token = req.headers['x-access-token'];
+    const job_id = req.headers['job_id'];
+    if(!job_id) return res.status(404).send({status: 'failed', message: 'No Job_ID provided!'});  
+    if(!token) return res.status(404).send({auth: false, message: 'No token provided!'});
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({auth: false,message: 'Failed to authenticate token.'});
+        if(!decoded) res.status(500).send({auth: false, message: 'Invalid token.'}); //invalid token
+        else if(decoded){
+            upload(req, res, function (err) {
+                //TODO later as an update when project approved and released add the image editor so the user can modify the images on the job as they want.
+                if(err){
+                    if(config.testingData){ console.log('Error Multer.', err )};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                const data = req.body;
+                if(config.testingData){ console.log('About to update data:', data)};
+                Job.findByIdAndUpdate(job_id, data, { new: true}, function(err, updated){
+                    if(err){
+                        if(config.testingData){ console.log('Error updating Job.', err)};
+                        return res.status(500).send({ status: 'failed', message: err });
+                    }
+                    return res.status(200).send({ status: 'sucess', message: `Job id:${updated._id}`, result: updated });
+                });
+            });
+        }
+    });
 })
+///END update/edit a job
 
 /////get job title on a user - just that.
 router.get('/myjoblist',function(req,res){

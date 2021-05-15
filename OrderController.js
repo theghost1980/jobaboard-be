@@ -305,7 +305,7 @@ router.post('/createOrder', function(req,res){
 });
 
 //look up into orders by filter and options
-router.get('/getOrderquery', function(req,res){
+router.get('/getOrderquery', function(req,res){ // const headers = { 'x-access-token': , 'query': JSON.stringify({ }), 'limit': 0, 'sortby': JSON.stringify({ null: 'null' }), }
     const token = req.headers['x-access-token'];
     const query = req.headers['query'];
     const limit = Number(req.headers['limit']);

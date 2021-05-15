@@ -432,9 +432,13 @@ router.post('/updateOrderStatus', function(req,res){
 //END Update the status of an order.
 
 ///////Methods to handle Market Orders //////////
-router.post('/createMarketOrder', function(req,res){
+router.post('/createMarketOrder', function(req,res){ //using this same one but with modifications
     //testing fire another one
     const token = req.headers['x-access-token'];
+    const operation = req.headers['operation']; //as 'create', 'update', 'cancel'
+    const order_id = req.headers['order_id'];
+    if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
+    if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -445,27 +449,39 @@ router.post('/createMarketOrder', function(req,res){
                     return res.status(500).send({ status: 'failed', message: err});
                 }
                 const data = req.body;
-                if(config.testingData){ console.log('About to create:', data)};
-                const item_type = data.item_type;
-                if(config.testingData){ 
-                    console.log('item_type:',item_type);
-                    console.log('original nft_instances', data.nft_instances);
-                };
-                if(item_type === "instance"){
-                    data.nft_instances = JSON.parse(data.nft_instances);
-                    if(config.testingData){ console.log('parsed field: ', data.nft_instances)};
-                }else{
-                    data.nft_definitions = JSON.parse(data.nft_definitions);
-                    if(config.testingData){console.log('parsed field: ', data.nft_definitions)} ;
-                }
-                if(config.testingData){ console.log('About to create(parsed data):', data)};
-                Order_Market.create(data, function(err, newOrder){
-                    if(err){
-                        if(config.testingData){ console.log('Error creating order:', err)};
-                        return res.status(500).send({ status: 'failed', message: err});
+                if(config.testingData){ console.log(`About to ${operation}:`, data)};
+                if(operation !== 'cancel'){
+                    const item_type = data.item_type;
+                    if(config.testingData){ 
+                        console.log('item_type:',item_type);
+                        console.log('original nft_instances', data.nft_instances);
+                    };
+                    if(item_type === "instance"){
+                        data.nft_instances = JSON.parse(data.nft_instances);
+                        if(config.testingData){ console.log('parsed field: ', data.nft_instances)};
+                    }else{
+                        data.nft_definitions = JSON.parse(data.nft_definitions);
+                        if(config.testingData){console.log('parsed field: ', data.nft_definitions)} ;
                     }
-                    return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
-                }) ;
+                }
+                if(config.testingData){ console.log(`About to ${operation}(parsed data):`, data)};
+                if(operation === 'create'){
+                    Order_Market.create(data, function(err, newOrder){
+                        if(err){
+                            if(config.testingData){ console.log('Error creating order:', err)};
+                            return res.status(500).send({ status: 'failed', message: err});
+                        }
+                        return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
+                    });
+                }else if(operation === 'update' || operation === 'cancel'){
+                    Order_Market.findByIdAndUpdate(order_id, data, function(err, updated){
+                        if(err){
+                            if(config.testingData){ console.log('Error updating order:', err)};
+                            return res.status(500).send({ status: 'failed', message: err});
+                        }
+                        return res.status(200).send({ status: 'sucess', result: updated, message: `Order Updated. Keep JABing!`})
+                    });
+                }
             });
         }else{
             return res.status(404).send({ auth: false, message: 'Failed to decode token.' });

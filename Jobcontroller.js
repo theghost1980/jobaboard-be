@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
 var Job = require('./Job');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 
 //+++++++++++++++++++++++++++++++++++++++++++++++
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,8 @@ var storage = multer.diskStorage({
         callback(null, file.fieldname + '_' + Date.now() + "_" + file.originalname);
     }
 });  
-var upload = multer({ storage: storage }).array("file");
+const upload = multer({ storage: storage }).array("file");
+const uploadSingle = multer({ storage: storage }).single("file");
 //////to delete the file after sending it to cloud
 const fs = require('fs');
 let resultHandler = function (err) {
@@ -121,7 +122,7 @@ router.post('/updateJob', function(req,res){
         if(err) return res.status(500).send({auth: false,message: 'Failed to authenticate token.'});
         if(!decoded) res.status(500).send({auth: false, message: 'Invalid token.'}); //invalid token
         else if(decoded){
-            upload(req, res, function (err) {
+            uploadSingle(req, res, function (err) {
                 //TODO later as an update when project approved and released add the image editor so the user can modify the images on the job as they want.
                 if(err){
                     if(config.testingData){ console.log('Error Multer.', err )};
@@ -132,7 +133,7 @@ router.post('/updateJob', function(req,res){
                     console.log('About to update On Job_id:', job_id);
                     console.log('About to update data:', data);
                 };
-                Job.findByIdAndUpdate(job_id, req.body, { new: true }, function(err, updated){
+                Job.findByIdAndUpdate(job_id, data, { new: true }, function(err, updated){
                     if(err){
                         if(config.testingData){ console.log('Error updating Job.', err)};
                         return res.status(500).send({ status: 'failed', message: err });

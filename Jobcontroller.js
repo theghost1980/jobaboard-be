@@ -132,7 +132,7 @@ router.post('/updateJob', function(req,res){
                     console.log('About to update On Job_id:', job_id);
                     console.log('About to update data:', data);
                 };
-                Job.findByIdAndUpdate(job_id, data, { new: true}, function(err, updated){
+                Job.findByIdAndUpdate(job_id, req.body, { new: true }, function(err, updated){
                     if(err){
                         if(config.testingData){ console.log('Error updating Job.', err)};
                         return res.status(500).send({ status: 'failed', message: err });

@@ -474,7 +474,7 @@ router.post('/createMarketOrder', function(req,res){ //using this same one but w
                         return res.status(200).send({ status: 'sucess', result: newOrder, message: `Order created. You can navigate to Marketplace > My Orders for review. Keep JABing!`})
                     });
                 }else if(operation === 'update' || operation === 'cancel'){
-                    Order_Market.findByIdAndUpdate(order_id, data, function(err, updated){
+                    Order_Market.findByIdAndUpdate(order_id, data, { new: true }, function(err, updated){
                         if(err){
                             if(config.testingData){ console.log('Error updating order:', err)};
                             return res.status(500).send({ status: 'failed', message: err});

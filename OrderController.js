@@ -460,7 +460,7 @@ router.post('/handleMarketOrder', function(req,res){
                             console.log('Error creating order:', err)
                             return res.status(500).send({ status: 'failed', message: err});
                         };
-                        return res.status({ status: 'sucess', result: result });
+                        return res.status(200).send({ status: 'sucess', result: result });
                     });
                 }else{
                     if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });

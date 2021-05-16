@@ -346,7 +346,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
                         console.log('Error trying to update the Nft',err);
                         return res.status(500).send({ status: 'failed', error: err});
                     }
-                    res.status(200).send({ status: 'sucess', result: updated});
+                    return res.status(200).send({ status: 'sucess', result: updated});
                 });
             }else{
                 const pfilter = JSON.parse(filter);

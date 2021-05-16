@@ -455,7 +455,7 @@ router.post('/handleMarketOrder', function(req,res){
                     console.log('Parsed Data:', pData);
                 }
                 if(operation === 'create'){
-                    Order_Market.insertMany(pData, function(err, result){
+                    Order_Market.insertMany([...pData], function(err, result){
                         if(config.testingData){ 
                             console.log('Error creating order:', err)
                             return res.status(500).send({ status: 'failed', message: err});

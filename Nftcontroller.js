@@ -328,7 +328,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
     const updatemany = req.headers['updatemany']; // so we can handle one or many record using one router.
     const query = req.headers['query'];
     const jsonQuery = JSON.parse(query);
-    const filter = req.headers['filter']; // json strinfigyed, mandatory to user the updatermany option
+    const filter = req.headers['filter']; // json strinfigyed, mandatory to use the updatermany option
     if(updatemany && !filter){ return res.status(404).send({ status: 'failed', message: 'No filter provided. Filter is mandatory to use the updatermany option'})};
     if(!jsonQuery) {
         console.log('A null || empty query has been made!');
@@ -350,6 +350,7 @@ router.post('/updateInstanceNFTfield', function(req,res){
                 });
             }else{
                 const pfilter = JSON.parse(filter);
+                console.log(pfilter);
                 Nft_user.updateMany(pfilter, jsonQuery,function(err, result){
                     if(err){
                         if(config.testingData){ console.log('Error when updating many instances.',err)};

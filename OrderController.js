@@ -432,6 +432,52 @@ router.post('/updateOrderStatus', function(req,res){
 //END Update the status of an order.
 
 ///////Methods to handle Market Orders //////////
+router.post('/handleMarketOrder', function(req,res){
+    const token = req.headers['x-access-token'];
+    const operation = req.headers['operation']; //as 'create', 'update', 'cancel'
+    const order_id = req.headers['order_id'];
+    if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            upload(req,res, function(err){
+                if(err){
+                    if(config.testingData){ console.log('Error on multer', err)};
+                    return res.status(500).send({ status: 'failed', message: err});
+                }
+                const data = req.body['data'];
+                if(!data) return res.status(404).send({ status: 'failed', message: 'Fatal no data provided. [{}]' });
+                const pData = JSON.parse(data);
+                if(config.testingData){
+                    console.log('About to:', operation);
+                    console.log('Original Data:', data);
+                    console.log('Parsed Data:', data);
+                }
+                
+
+                // if(operation === 'create'){
+                //     Order_Market.insertMany(req.body, function(err, result){
+                //         if(config.testingData){ 
+                //             console.log('Error creating order:', err)
+                //             return res.status(500).send({ status: 'failed', message: err});
+                //         };
+                //         return res.status({ status: 'sucess', result: result });
+                //     });
+                // }else{
+                //     if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
+                //     if(operation === 'update'){
+
+                //     }else if(operation === 'cancel'){
+
+                //     }
+                // }
+            });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    })
+});
 router.post('/createMarketOrder', function(req,res){ //using this same one but with modifications
     //testing fire another one
     const token = req.headers['x-access-token'];

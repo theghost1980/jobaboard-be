@@ -12,6 +12,11 @@ var OrderMarketSchema = new mongoose.Schema({
     note: String, ////just used as reported or admins.
     item_type: String, //"definition" or "instance"
     orderId: Number, //to be used just when order make on hive market, so we can cancel it.
+    nft_id: Number,
+    nft_instance_id: Number,
+    price: Number,
+    priceSymbol: String,
+    fee: Number,
     nft_instances: [ //so we can handle i.e, buy of 4 instances with same priceSymbol or n definitions with same priceSymbol.
         { 
             symbol: String,

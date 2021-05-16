@@ -452,26 +452,24 @@ router.post('/handleMarketOrder', function(req,res){
                 if(config.testingData){
                     console.log('About to:', operation);
                     console.log('Original Data:', data);
-                    console.log('Parsed Data:', data);
+                    console.log('Parsed Data:', pData);
                 }
-                
+                if(operation === 'create'){
+                    Order_Market.insertMany(pData, function(err, result){
+                        if(config.testingData){ 
+                            console.log('Error creating order:', err)
+                            return res.status(500).send({ status: 'failed', message: err});
+                        };
+                        return res.status({ status: 'sucess', result: result });
+                    });
+                }else{
+                    if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
+                    if(operation === 'update'){
 
-                // if(operation === 'create'){
-                //     Order_Market.insertMany(req.body, function(err, result){
-                //         if(config.testingData){ 
-                //             console.log('Error creating order:', err)
-                //             return res.status(500).send({ status: 'failed', message: err});
-                //         };
-                //         return res.status({ status: 'sucess', result: result });
-                //     });
-                // }else{
-                //     if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
-                //     if(operation === 'update'){
+                    }else if(operation === 'cancel'){
 
-                //     }else if(operation === 'cancel'){
-
-                //     }
-                // }
+                    }
+                }
             });
         }else{
             return res.status(404).send({ auth: false, message: 'Failed to decode token.' });

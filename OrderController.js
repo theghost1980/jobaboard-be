@@ -471,6 +471,7 @@ router.post('/handleMarketOrder', function(req,res){
                             if(config.testingData){ console.log(`Error ${operation}ing Orders.`, err )};
                             return res.status(500).send({ status: 'failed', message: err});
                         }
+                        if(config.testingData){ console.log('Cancel or Update results:', result )};
                         return res.status(200).send({ status: 'sucess', result: result });
                     });
                 }

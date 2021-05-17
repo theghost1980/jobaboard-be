@@ -76,6 +76,7 @@ router.get('/queryContractTable', function(req,res){
                     if(config.testingData){ console.log('Error on query:', query) };
                     return res.status(500).send({ status: 'failed', message: err });
                 }
+                if(config.testingData){ console.log('Results', result)};
                 return res.status(200).send({ status: 'sucess', result: result });
             })
         }else{

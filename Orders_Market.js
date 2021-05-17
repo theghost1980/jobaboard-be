@@ -18,7 +18,7 @@ var OrderMarketSchema = new mongoose.Schema({
     price: Number,
     priceSymbol: String,
     fee: Number,
-    nft_instances: [ //To be used only in Buy multiple
+    nft_instances: [ //To be used only in Buy & Buy multiple
         { 
             from_account: String,
             symbol: String,

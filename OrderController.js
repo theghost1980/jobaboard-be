@@ -434,8 +434,8 @@ router.post('/updateOrderStatus', function(req,res){
 ///////Methods to handle Market Orders //////////
 router.post('/handleMarketOrder', function(req,res){
     const token = req.headers['x-access-token'];
-    const operation = req.headers['operation']; //as 'create', 'update', 'cancel'
-    const order_id = req.headers['order_id'];
+    const operation = req.headers['operation']; //as 'buy', 'sell', 'update', 'cancel'
+    const order_id = req.headers['order_id']; // as [ { order._id }, ...  ] so we cancel || update each one of them in one operation.
     if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
@@ -454,7 +454,7 @@ router.post('/handleMarketOrder', function(req,res){
                     console.log('Original Data:', data);
                     console.log('Parsed Data:', pData);
                 }
-                if(operation === 'create'){
+                if(operation === 'buy' || operation === 'sell'){
                     Order_Market.insertMany(pData, function(err, result){
                         if(err){
                             if(config.testingData){ console.log('Error creating order:', err)};
@@ -462,13 +462,17 @@ router.post('/handleMarketOrder', function(req,res){
                         }
                         return res.status(200).send({ status: 'sucess', result: result });
                     });
-                }else{
+                }else if(operation === 'update' || operation === 'cancel'){
                     if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
-                    if(operation === 'update'){
-
-                    }else if(operation === 'cancel'){
-
-                    }
+                    const pOrder_id_Array = JSON.parse(order_id);
+                    if(config.testingData){ console.log(`About to ${operation}`, pOrder_id_Array)};
+                    Order_Market.updateMany(pOrder_id_Array, pData, function(err, result){
+                        if(err){
+                            if(config.testingData){ console.log(`Error ${operation}ing Orders.`, err )};
+                            return res.status(500).send({ status: 'failed', message: err});
+                        }
+                        return res.status(200).send({ status: 'sucess', result: result });
+                    });
                 }
             });
         }else{

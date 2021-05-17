@@ -466,7 +466,7 @@ router.post('/handleMarketOrder', function(req,res){
                     if(!order_id) return res.status(404).send({ auth: false, message: 'No order_id provided!' });
                     const pOrder_id_Array = JSON.parse(order_id);
                     if(config.testingData){ console.log(`About to ${operation}`, pOrder_id_Array)};
-                    Order_Market.updateMany(pOrder_id_Array, pData, function(err, result){
+                    Order_Market.updateMany(pOrder_id_Array, { $set: pData }, function(err, result){
                         if(err){
                             if(config.testingData){ console.log(`Error ${operation}ing Orders.`, err )};
                             return res.status(500).send({ status: 'failed', message: err});

@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var Order = require('./Orders');
 var Order_Market = require('./Orders_Market');
 var Review = require('./Review');
+const Wishlist = require('./Wishlist');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 // const formidable = require('formidable');
@@ -365,7 +366,49 @@ router.get('/getOrderquery', function(req,res){ // const headers = { 'x-access-t
 // 3. The other part told me he/she cannot fullfill this order, so we will adjust the tokens.
 // 4. Other, specify.
 
-//END Handling reviews 
+//////HANDLING wishlist///////
+router.post('/handleRequestWishlist', function(req,res){
+    const token = req.headers['x-access-token'];
+    const operation = req.headers['operation'];
+    const query = req.headers['query']; // {  field: '' }.
+    if(!query) return res.status(404).send({ auth: false, message: 'No Query provided!' });
+    if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+                upload(req, res, function(err){ 
+                    if(err){
+                        if(config.testingData){ console.log('Error on Multer wishlist', err )};
+                        return res.status(500).send({ status: 'failed', message: err});
+                    };
+                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, req.body)};
+                    if(operation === 'create'){
+                        Wishlist.findOne(query, function(err, found){
+                            if(err){
+                                if(config.testingData){ console.log('Error on find wishlist query', query, err )};
+                                return res.status(500).send({ status: 'failed', message: err });
+                            }
+                            if(found){ return res.status(200).send({ status: 'exists', result: found })};
+                            Wishlist.create(req.body, function(err, created){
+                                if(err){
+                                    if(config.testingData){ console.log('Error on creation wishlist', err )};
+                                    return res.status(500).send({ status: 'failed', message: err });
+                                }
+                                return res.status(200).send({ status: 'sucess', result: created });
+                            });
+                        }); 
+                    }else if(operation === 'update'){
+                        //TODO
+                    }
+                });
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+//////END HANDLING wishlist///////
+
 router.post('/updateOrderStatus', function(req,res){
     const token = req.headers['x-access-token'];
     const status = req.headers['status']; //"Completed", "Reported", "Cancelled"

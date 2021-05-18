@@ -383,7 +383,7 @@ router.post('/handleRequestWishlist', function(req,res){
                         return res.status(500).send({ status: 'failed', message: err});
                     };
                     const data = req.body;
-                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, data)};
+                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data, query, as:`, { data, query })};
                     if(operation === 'create'){
                         Wishlist.findOne(JSON.parse(query), function(err, found){
                             if(err){
@@ -401,6 +401,15 @@ router.post('/handleRequestWishlist', function(req,res){
                         }); 
                     }else if(operation === 'update'){
                         //TODO
+                        console.log('TODO');
+                    }else if(operation === 'find'){
+                        Wishlist.find(JSON.parse(query), function(err, founds){
+                            if(err){
+                                if(config.testingData){ console.log('Error on find wishlist query', query, err )};
+                                return res.status(500).send({ status: 'failed', message: err });
+                            }
+                            return res.status(200).send({ status: 'sucess', result: founds });
+                        });
                     }
                 });
         }else{

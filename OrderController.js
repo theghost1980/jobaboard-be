@@ -364,6 +364,8 @@ router.get('/getOrderquery', function(req,res){ // const headers = { 'x-access-t
 // 2. I did this order by mistake, I will contact the other part to agree for a refund.
 // 3. The other part told me he/she cannot fullfill this order, so we will adjust the tokens.
 // 4. Other, specify.
+
+//END Handling reviews 
 router.post('/updateOrderStatus', function(req,res){
     const token = req.headers['x-access-token'];
     const status = req.headers['status']; //"Completed", "Reported", "Cancelled"

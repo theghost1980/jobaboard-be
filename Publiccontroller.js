@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+const Reviews = require('./Review');
 const Nft = require('./Nft');
 const Nft_user = require('./Nft_user');
 var jwt = require('jsonwebtoken');
@@ -159,5 +160,29 @@ router.get('/getNFTInstancesQuery', function(req,res){
     }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
 });
 ////////////////////////////////////////////
+
+/////////Public routes for Reviews//////////
+router.get('/queryReview', function(req,res){ //for now as public
+    const query = req.headers['query'];
+    const limit = Number(req.headers['limit']);
+    const sortby = JSON.parse(req.headers['sortby']);
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty public query has been made!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    //TODO process the query check for nulls || "" and create teh newQuery.
+    const newNode = {};
+    Object.entries(jsonQuery).forEach(([key, val]) => { if(val !== null && val !== ""){ return (newNode[key] = val) } });
+    console.log('New public query to process::::', { newNode, limit, sortby});
+    Reviews.find(newNode,function(err, reviews){
+        if(err){
+            if(config.testingData){ console.log('Error finding Review on public query',err) };
+            return res.status(500).send({ status: 'failed', message: err});
+        }
+        return res.status(200).send({ status: 'sucess', result: reviews });
+    }).limit(limit).sort(sortby.hasOwnProperty("null") ? null : sortby);
+});
+/////////END Public routes for Reviews//////////
 
 module.exports = router;

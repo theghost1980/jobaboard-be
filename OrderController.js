@@ -383,7 +383,7 @@ router.post('/handleRequestWishlist', function(req,res){
                         return res.status(500).send({ status: 'failed', message: err});
                     };
                     const data = req.body;
-                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, req.data)};
+                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, data)};
                     if(operation === 'create'){
                         Wishlist.findOne(JSON.parse(query), function(err, found){
                             if(err){

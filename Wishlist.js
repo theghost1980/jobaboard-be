@@ -5,7 +5,10 @@ var mongoose = require('mongoose');
 var WishlistSchema = new mongoose.Schema({
     username: String,
     owner: String,
-    record_active: Boolean, //so when user wants to delete his actual wishlist, we will handle this field as we keep the record for later.
+    record_active: { //so when user wants to delete his actual wishlist, we will handle this field as we keep the record for later.
+        type: Boolean,
+        default: true,
+    }, 
     image: String,
     thumb: String, 
     item_type: String, //as instance || definition.
@@ -17,7 +20,7 @@ var WishlistSchema = new mongoose.Schema({
     nft_instance_id: Number,
     nft_definition_id: Number,
     price: Number,
-    priceSymbol: Number,
+    priceSymbol: String,
     orderId: String,
     createdAt: Date,
     updatedAt: Date,

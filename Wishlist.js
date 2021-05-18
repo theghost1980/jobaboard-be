@@ -17,7 +17,7 @@ var WishlistSchema = new mongoose.Schema({
     nft_definition_id: Number,
     price: Number,
     priceSymbol: Number,
-    orderId: Number,
+    orderId: String,
     createdAt: Date,
     updatedAt: Date,
 });

@@ -13,6 +13,7 @@ var WishlistSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     }, 
+    nft_symbol: String,
     nft_instance_id: Number,
     nft_definition_id: Number,
     price: Number,

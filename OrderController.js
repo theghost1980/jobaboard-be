@@ -382,9 +382,10 @@ router.post('/handleRequestWishlist', function(req,res){
                         if(config.testingData){ console.log('Error on Multer wishlist', err )};
                         return res.status(500).send({ status: 'failed', message: err});
                     };
-                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, req.body)};
+                    const data = req.body;
+                    if(config.testingData){ console.log(`About to handle ${operation} on wishlist, data as:`, req.data)};
                     if(operation === 'create'){
-                        Wishlist.findOne(query, function(err, found){
+                        Wishlist.findOne(JSON.parse(query), function(err, found){
                             if(err){
                                 if(config.testingData){ console.log('Error on find wishlist query', query, err )};
                                 return res.status(500).send({ status: 'failed', message: err });

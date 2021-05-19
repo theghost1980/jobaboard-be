@@ -93,7 +93,7 @@ router.post('/handleNotification', function(req,res){
                     });
                 }else if(operation === 'markread'){
                     if(config.testingData){ console.log(`About to handle ${operation} with noti_id:`, noti_id)};
-                    Notifications.findOneAndUpdate(noti_id, { opened: true }, { new: true }, function(err, readNoti){
+                    Notifications.findByIdAndUpdate(noti_id, { opened: true }, { new: true }, function(err, readNoti){
                         if(err){
                             if(config.testingData){ console.log('Error setting noti to read.', err )};
                             return res.status(500).send({ status: 'failed', message: err });

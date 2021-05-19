@@ -81,9 +81,9 @@ router.post('/handleNotification', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             upload(req, res, function(err){
-                const pData = JSON.parse(req.body['data']);
-                if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData)};
                 if(operation === 'create'){
+                    const pData = JSON.parse(req.body['data']);
+                    if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData)};
                     Notifications.create(pData, function(err, created){
                         if(err){
                             if(config.testingData){ console.log('Error creating noti.', err)};
@@ -92,6 +92,7 @@ router.post('/handleNotification', function(req,res){
                         return res.status(200).send({ status: 'sucess', message: `Notification Sent to ${created.username}`})
                     });
                 }else if(operation === 'markread'){
+                    if(config.testingData){ console.log(`About to handle ${operation} with noti_id:`, noti_id)};
                     Notifications.findOneAndUpdate(noti_id, { opened: true }, { new: true }, function(err, readNoti){
                         if(err){
                             if(config.testingData){ console.log('Error setting noti to read.', err )};

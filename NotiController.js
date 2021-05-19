@@ -81,7 +81,7 @@ router.post('/handleNotification', function(req,res){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             upload(req, res, function(err){
-                const pData = JSON.parse(req.headers['data']);
+                const pData = JSON.parse(req.body['data']);
                 if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData)};
                 if(operation === 'create'){
                     Notifications.create(pData, function(err, created){

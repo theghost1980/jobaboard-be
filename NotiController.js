@@ -82,6 +82,7 @@ router.post('/handleNotification', function(req,res){
         if(decoded){
             upload(req, res, function(err){
                 const data = req.body;
+                console.log('Original data:', data);
                 const pData = JSON.parse(data);
                 if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData)};
                 if(operation === 'create'){

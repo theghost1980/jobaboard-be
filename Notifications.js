@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
-var UserSchema = new mongoose.Schema({
+var NotiSchema = new mongoose.Schema({
     type: String,
     title: String,
     createdAt: Date,
+    updatedAt: Date,
     content: String,
     opened: Boolean,
     username: String,
@@ -10,7 +11,8 @@ var UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    made_by: String,
 });
-mongoose.model('Notifications',UserSchema);
+mongoose.model('Notifications', NotiSchema);
 
 module.exports = mongoose.model('Notifications');

@@ -8,21 +8,51 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
 
-//////////
-//check if valid Id object first
-// function checkId(id){
-//     return (id.match(/^[0-9a-fA-F]{24}$/)) ? true : false;
-// }
-//end stric checks
-//////////
+///////Important to handle cluodinary + multer
+//declarations
+//cloudinary CDN images
+var cloudinary = require('cloudinary').v2;
+//config
+cloudinary.config({
+    cloud_name: config.cloud_name,
+    api_key: config.api_key,
+    api_secret: config.api_secret,
+});
+/////////////
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Destination:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, __dirname + '/uploads')
+    },
+    filename: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Filename:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, file.fieldname + '_' + Date.now() + "_" + file.originalname);
+    }
+});  
+const upload = multer({ storage: storage }).single("file");
+
+//////to delete the file after sending it to cloud
+const fs = require('fs');
+let resultHandler = function (err) {
+    if (err) {
+        console.log("unlink failed", err);
+    } else {
+        console.log("file deleted from temporary server storage");
+    }
+}
+////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////
 
 /////////////////////////
 //Final routers for Notifications
 //Get notifications by username
 router.get('/:username', function(req, res){
-    //check for a valid token
-    var token = req.headers['x-access-token'];
-    console.log('Token', token);
+    const token = req.headers['x-access-token'];
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -39,5 +69,35 @@ router.get('/:username', function(req, res){
         }
     });
 });
+
+///CRUD notis
+router.post('/handleNotification', function(req,res){
+    const token = req.headers['x-access-token'];
+    const operation = req.headers['operation']; //as create, update, delete.
+    const noti_id = req.headers['noti_id']; //as create, update, delete.
+    if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            upload(req, res, function(err){
+                const pData = JSON.parse(req.body);
+                if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData)};
+                if(operation === 'create'){
+                    Notifications.create(pData, function(err, created){
+                        if(err){
+                            if(config.testingData){ console.log('Error creating noti.', err)};
+                            return res.status(500).send({ status: 'failed', message: err });
+                        }
+                        return res.status(200).send({ status: 'sucess', message: `Notification Sent to ${created.username}`})
+                    });
+                }
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Error decoding token.' });
+        }
+    });
+});
+///END crud notis
 
 module.exports = router;

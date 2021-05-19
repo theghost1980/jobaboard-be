@@ -73,7 +73,7 @@ router.get('/:username', function(req, res){
 ///CRUD notis
 router.post('/handleNotification', function(req,res){
     const token = req.headers['x-access-token'];
-    const operation = req.headers['operation']; //as create, update, delete.
+    const operation = req.headers['operation']; //as create, update, delete || markread.
     const noti_id = req.headers['noti_id']; //as create, update, delete.
     if(!operation) return res.status(404).send({ auth: false, message: 'No operation provided!' });
     if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
@@ -91,6 +91,14 @@ router.post('/handleNotification', function(req,res){
                         }
                         return res.status(200).send({ status: 'sucess', message: `Notification Sent to ${created.username}`})
                     });
+                }else if(operation === 'markread'){
+                    Notifications.findOneAndUpdate(noti_id, { opened: true }, { new: true }, function(err, readNoti){
+                        if(err){
+                            if(config.testingData){ console.log('Error setting noti to read.', err )};
+                            return res.status(500).send({ status: 'failed', message: err });
+                        }
+                        return res.status(200).send({ status: 'sucess', message: 'Set as read', result: readNoti });
+                    })
                 }
             });
         }else{

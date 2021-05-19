@@ -63,7 +63,7 @@ router.get('/:username', function(req, res){
                 if(!docs) return res.status(404).send({ message: "No notifications for this user" });
                 res.status(200).send(docs);
                 console.log(`Searched Notifications on DB. \n name:${decoded.usernameHive} \n Time:${time}`);
-            }).sort({ createdAt: 1});
+            }).sort({ createdAt: -1});
         }else{
             return res.status(500).send({ auth: false, message: 'Error authenticating token GET notifications.' });
         }

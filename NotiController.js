@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
     }
 });  
 const upload = multer({ storage: storage }).single("file");
-const uploads = multer({ storage: storage }).array("files");
+const uploads = multer({ storage: storage }).array("file");
 //////to delete the file after sending it to cloud
 const fs = require('fs');
 let resultHandler = function (err) {

@@ -129,7 +129,7 @@ router.post('/handleSupport', function(req,res){
                 }
                 if(operation.operation === 'create'){
                     if(config.testingData){ console.log(`About to handle ${operation} with data files:`, req.body) };
-                    if(req.files){//update them to cloudinary and get the urls.
+                    if(req.files.length > 0){//update them to cloudinary and get the urls.
                         let res_promises = req.files.map(file => new Promise((resolve,reject) => {
                             cloudinary.uploader.upload(file.path,{ tags: 'support-Multiple'}, function(err, image){
                                 if(err) reject(err) 
@@ -153,7 +153,9 @@ router.post('/handleSupport', function(req,res){
                         })
                         .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
                     }else{ //no files just save the rest
+                        console.log('No files');
                         const pData = JSON.parse(req.body['data']);
+                        console.log('About to save with no files:', pData);
                         if(!pData) return res.status(404).send({ status: 'failed', message: 'No data provided!'});
                         Support.create(pData, function(err, created){
                             if(err){

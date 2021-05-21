@@ -143,8 +143,7 @@ router.post('/handleSupport', function(req,res){
                         Promise.all(res_promises)
                         .then(result => { //result is the array holding the images as we need them.
                             if(config.testingData){ console.log('result:', result) };
-                            const data = {};
-                            data = req.body;
+                            const data = req.body;
                             data.images = [...result]; //we should have the array if any now we create.
                             if(config.testingData){ console.log('About To save:', data) };
                             Support.create(data, function(err, supportTicket){

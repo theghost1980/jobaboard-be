@@ -127,10 +127,8 @@ router.post('/handleSupport', function(req,res){
                     if(config.testingData){ console.log('Err on Multer', err)};
                     return res.status(500).send({ status: 'failed', message: err });
                 }
-                if(operation === 'create'){
-                    const pData = JSON.parse(req.body['data']);
-                    if(!pData) return res.status(404).send({ status: 'failed', message: 'No data provided!'});
-                    if(config.testingData){ console.log(`About to handle ${operation} with data:`, pData) };
+                if(operation.operation === 'create'){
+                    if(config.testingData){ console.log(`About to handle ${operation} with data files:`, req.body) };
                     if(req.files){//update them to cloudinary and get the urls.
                         let res_promises = req.files.map(file => new Promise((resolve,reject) => {
                             cloudinary.uploader.upload(file.path,{ tags: 'support-Multiple'}, function(err, image){
@@ -155,6 +153,8 @@ router.post('/handleSupport', function(req,res){
                         })
                         .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
                     }else{ //no files just save the rest
+                        const pData = JSON.parse(req.body['data']);
+                        if(!pData) return res.status(404).send({ status: 'failed', message: 'No data provided!'});
                         Support.create(pData, function(err, created){
                             if(err){
                                 if(config.testingData){ console.log('Error creating support ticket.', err)};

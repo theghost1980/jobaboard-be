@@ -152,6 +152,10 @@ router.post('/checkGatsbySig', async function(req, res){
     //to do a try-catch that handle if this is a valid sig or somehow check if valid before getting into this point
     // const dataRemote = Signature.fromString(signature).recover(cryptoUtils.sha256(config.moreSecret)).toString();
     //NEW WAY testing today 19/03/2021
+
+    // TODO HERE imporant
+    // Using cludinary to upload an image from URL, we will get the users image from hive on first login
+    // create the new url + thumb an set that info into mongoDB
     const { signature, account } = req.body;
     try {
         Signature.fromString(signature).recover(cryptoUtils.sha256(ts)).toString();

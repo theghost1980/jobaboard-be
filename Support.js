@@ -5,7 +5,10 @@ var SupportSchema = new mongoose.Schema({
     ip_address: String,
     ticket_type: String, //as general-support, specific-support, bug, suggestion, idea-improvement.
     category_support: String,
-    solved: Boolean,
+    solved: {
+        type: Boolean,
+        default: false,
+    },
     ref_id: String, //if needed the user may fill as tx_id or transaction id.
     issue_description: String,
     issue_note: String,

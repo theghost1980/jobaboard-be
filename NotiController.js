@@ -128,7 +128,7 @@ router.post('/handleSupport', function(req,res){
                     return res.status(500).send({ status: 'failed', message: err });
                 }
                 if(operation.operation === 'create'){
-                    if(config.testingData){ console.log(`About to handle ${operation} with data files:`, req.body) };
+                    if(config.testingData){ console.log(`About to handle ${operation.operation} with data files:`, req.body) };
                     if(req.files.length > 0){//update them to cloudinary and get the urls.
                         let res_promises = req.files.map(file => new Promise((resolve,reject) => {
                             cloudinary.uploader.upload(file.path,{ tags: 'support-Multiple'}, function(err, image){
@@ -142,16 +142,19 @@ router.post('/handleSupport', function(req,res){
                         )
                         Promise.all(res_promises)
                         .then(result => { //result is the array holding the images as we need them.
+                            if(config.testingData){ console.log('result:', result) };
                             const data = {};
                             data = req.body;
                             data.images = [...result]; //we should have the array if any now we create.
                             if(config.testingData){ console.log('About To save:', data) };
-                            Support.create(data,function(err, supportTicket){
+                            Support.create(data, function(err, supportTicket){
                                 if(err) return res.status(500).send({ status: 'failed', message: err });
                                 return res.status(200).send({ status: 'sucess', message: `Support ticket created with id:${supportTicket._id}.We will process it and reply back as soon as possible.`, result: supportTicket });
                             });
-                        })
-                        .catch((error) => { res.status(400).send({'status': 'failed', 'message': error})});
+                        }).catch(error => { 
+                            if(config.testingData){ console.log('Error uploading to cloudinary.', error )};
+                            return res.status(500).send({status: 'failed', message: error });
+                        });
                     }else{ //no files just save the rest
                         console.log('No files');
                         const pData = JSON.parse(req.body['data']);

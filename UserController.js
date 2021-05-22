@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(bodyParser.json());
 var User = require('./User');
+const Support = require('./Support');
 var Logs = require('./Logs');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
@@ -91,6 +92,36 @@ router.post('/saveImage', function (req, res) {
 //////////END Whole process to upload an image from client/////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //+++++++++++++++++++++++++++++++++++++++++++++++
+
+
+////////routes to process user's request on tickets
+////query support tickets
+router.get('/getSupportTicket', function(req,res){ 
+    const token = req.headers['x-access-token'];
+    const query = req.headers['query']; //AS query = { 'filter': { username: String,...}, 'limit': 0, 'sortby': { createdAt: 1}}
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty query has been made on Support tickets!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            console.log('New query to process on Tickets:', jsonQuery);
+            Support.find(jsonQuery.filter,function(err, tickets){
+                if(err){
+                    if(config.testingData){ console.log('Error finding Ticket',err);}
+                    return res.status(500).send({ status: 'failed', message: err});
+                }
+                return res.status(200).send({ status: 'sucess', result: tickets });
+            }).limit(jsonQuery.limit).sort(jsonQuery.sortby);
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+///////END processing tickets requests
 
 //method to find for a user but when you are logged
 router.get('/findJabUser', function(req,res){

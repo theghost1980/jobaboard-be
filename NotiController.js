@@ -113,7 +113,36 @@ router.post('/handleNotification', function(req,res){
 ///END crud notis
 
 
+////////////////////////////////
 ///CRUD Support tickets - suggestions - bugs.
+
+////query support tickets
+router.get('/getSupportTicket', function(req,res){ 
+    const token = req.headers['x-access-token'];
+    const query = req.headers['query']; //AS query = { 'filter': { username: String,...}, 'limit': 0, 'sortby': { createdAt: 1}}
+    const jsonQuery = JSON.parse(query);
+    if(!jsonQuery) {
+        console.log('A null || empty query has been made on Support tickets!');
+        return res.status(404).send({ status: 'funny', message: "I cannot process that!"});
+    }
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            console.log('New query to process on Tickets:', jsonQuery);
+            Support.find(jsonQuery.filter,function(err, tickets){
+                if(err){
+                    if(config.testingData){ console.log('Error finding Ticket',err);}
+                    return res.status(500).send({ status: 'failed', message: err});
+                }
+                return res.status(200).send({ status: 'sucess', result: tickets });
+            }).limit(jsonQuery.limit).sort(jsonQuery.sortby);
+        }else{
+            return res.status(404).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+
 router.post('/handleSupport', function(req,res){
     const token = req.headers['x-access-token'];
     const operation = JSON.parse(req.headers['operation']); // { operation: 'create,update,delete', sup_id: '' }

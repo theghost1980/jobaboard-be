@@ -85,7 +85,7 @@ router.get('/publicQueryContractTable', function(req,res){
     if(!query) return res.status(404).send({ status: 'failed', message: 'No query provided!' });
     const pQuery = JSON.parse(query);
     if(config.testingData){ console.log('About to process:', pQuery)};
-    ssc.find(pQuery.contract, pQuery.table, pQuery.query, pQuery.limit, pQuery.offset, pQuery.indexes, (err, result) => {
+    sscMain.find(pQuery.contract, pQuery.table, pQuery.query, pQuery.limit, pQuery.offset, pQuery.indexes, (err, result) => {
         if(err){
             if(config.testingData){ console.log('Error on query:', query) };
             return res.status(500).send({ status: 'failed', message: err });

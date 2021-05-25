@@ -17,7 +17,7 @@ function saveLog(from_req,is_system=false, log_type='',action='',note='', txID='
     // is_system: Boolean,
     // log_type: String, //as 'login', 'logout', 'support', 'marketplace', 'operation'
     // action: String, //if needed as 'buy','sell','edit','query'
-    const log = { is_system: is_system,log_type: log_type, action: action, txID: txID,op: op,totalSteps: totalSteps, result: result,error: error,descError: descError,data: data,username: username,usertype: usertype,ipaddress: ipaddress,createdAt: createdAt,event: event,};
+    const log = { is_system: is_system,log_type: log_type, action: action, note: note, txID: txID,op: op,totalSteps: totalSteps, result: result,error: error,descError: descError,data: data,username: username,usertype: usertype,ipaddress: ipaddress,createdAt: createdAt,event: event,};
     const logCleaned = {};
     Object.entries(log).forEach(([key,value]) => {
         if(value !== '' && value !== null && value !== undefined){ logCleaned[key]= value; };
@@ -129,6 +129,7 @@ function saveLog(from_req,is_system=false, log_type='',action='',note='', txID='
 //     });
 // });
 
+
 //check active token and valid one
 //find user who is already logged in, anytime a new request is being made,
 // i.e. check profile, save data or create contracts.
@@ -150,6 +151,7 @@ router.post('/checkGatsbySig', async function(req, res){
     //dummy image if user not have profileImg set
     var profile_PicURL = "https://res.cloudinary.com/dbcugb6j4/image/upload/v1614450740/dummy-profilePic_ogyaoc.png";
     const ts = req.headers['ts'];
+    const login_method = "hive_key_chain";
     if(config.testingData === 'true'){
         console.log('A request AUTH/keychain has been made! -testing mode-');
         console.log(`ts:${ts}`);
@@ -232,31 +234,22 @@ router.post('/checkGatsbySig', async function(req, res){
                         console.log(err);
                     };
                     if(!usr){
-                        console.log('User not found on DB');
-                        console.log('Now we should create it');
-                        //user's creation
-                        User.create({
-                            username: account,
-                            pk: key,
-                            avatar: profile_PicURL,
-                            usertype: 'user',
-                            createdAt: time,
-                            },
-                            function(err, user){
-                                if(err){
-                                    console.log('Error trying to add new user on DB!');
-                                    console.log(err);
-                                }
+                        if(config.testingData){ console.log('User not found on DB, creating a new one.'); }
+                        User.create({ username: account, pk: key, avatar: profile_PicURL, usertype: 'user', createdAt: time, }, function(err, user){
+                                if(err){ console.log('Error trying to add new user on DB!', err);}
                                 if(user){
                                     console.log(`Created User on DB. \nname:${user.username} \ntype:${user.usertype} \nTime:${time}`);
                                     userT = user.usertype;
                                     banned = user.banned;
+                                    saveLog(false, false,'log_in','first_time_log_in',banned,'','','',`login_method:${login_method}`,'','','',account,userT,req.ip,time,'');
+                                    return RES.status(200).send({ auth: true, token: token, message: 'Access Granted!', profile_PicURL: profile_PicURL, usertype: userT, banned: banned, });
                                 } 
                             }
                         );
                     }else if(usr){
-                        console.log('User found:',usr.username);
-                        console.log('User type:',usr.usertype);
+                        if(config.testingData) { console.log('User found:',usr.username);
+                            console.log('User type:',usr.usertype);
+                        };
                         userT = usr.usertype;
                         banned = usr.banned;
                         if(usr.avatar){
@@ -268,19 +261,9 @@ router.post('/checkGatsbySig', async function(req, res){
                     //if found returns it foto profile, if not present send hive profilePICurl
                     //if not found register as new on db.
                     //create log
-                    saveLog(false, false,'log_in','none',banned,'','','','','','','',account,userT,req.ip,time,'');
-                    if(config.testingData === 'true'){
-                        console.log(`Received at:\n${time}`);
-                        console.log(`User:${account}, auth:True.\nType:${userT}`);
-                        console.log(`Create Log - Login event. Registered)`);
-                    }
-                    return RES.status(200).send({   auth: true, 
-                                                    token: token, 
-                                                    message: 'Access Granted!', 
-                                                    profile_PicURL: profile_PicURL,
-                                                    usertype: userT,
-                                                    banned: banned,
-                                                });
+                    saveLog(false, false,'log_in','none',banned,'','','',`login_method:${login_method}`,'','','',account,userT,req.ip,time,'');
+                    if(config.testingData === 'true'){ console.log(`Received at:\n${time}\nUser:${account}, auth:True.\nType:${userT}\nCreate Log - Login event. Registered)`);}
+                    return RES.status(200).send({   auth: true, token: token, message: 'Access Granted!', profile_PicURL: profile_PicURL, usertype: userT, banned: banned, });
                 });
                 // return res.status(200).send({ auth: true, token: token, message: 'Access Granted...Finally!' });
             }else{
@@ -305,41 +288,25 @@ router.post('/checkGatsbySig', async function(req, res){
 
 //When user log in using Hivesigner
 router.post('/checkGatsbySig2', async function(req, res){
-    if(config.testingData === 'true'){
-        console.log('A request AUTH/hivesign has been made! -testing mode-');
-    }
+    if(config.testingData === 'true'){ console.log('A request AUTH/hivesign has been made! -testing mode-') };
+    const login_method = 'hive_signer';
     var userT = 'user';
     const time = new Date();
     const { account } = req.body;
-    var token = jwt.sign({ usernameHive: account }, 
-        config.secret, { expiresIn: 21600 });
-    //test to set the token on headers
-    let RES = res.set('Authorization', `Bearer ${token}`);
+    var token = jwt.sign({ usernameHive: account }, config.secret, { expiresIn: 21600 });
+    let RES = res.set('Authorization', `Bearer ${token}`); //set the token on headers
     RES.set('ExpiresIn','6h');
     User.findOne({ username: account },function(err, usr){
-        if(err){
-            console.log('There was a problem finding the user on DB');
-            console.log(err);
-        };
+        if(err){ console.log('There was a problem finding the user on DB', err);};
         if(!usr){
-            console.log('User not found on DB');
-            console.log('Now we should create it');
-            //user's creation
-            User.create({
-                username: account,
-                pk: '',
-                avatar: '',
-                usertype: 'user',
-                createdAt: time,
-                },
-                function(err, user){
-                    if(err){
-                        console.log('Error trying to add new user on DB!');
-                        console.log(err);
-                    }
+            console.log('User not found on DB, create it');
+            User.create({ username: account, pk: '', avatar: '', usertype: 'user', createdAt: time, }, function(err, user){
+                    if(err){ console.log('Error trying to add new user on DB!', err); };
                     if(user){
                         console.log(`Created User on DB. \nname:${user.username} \ntype:${user.usertype} \nTime:${time}`);
                         userT = user.usertype;
+                        saveLog(false, false,'log_in','first_time_log_in','','','','',`login_method:${login_method}`,'','','',account,user.usertype,req.ip,time,'');
+                        return RES.status(200).send({ auth: true, token: token, message: 'Access Granted!', profile_PicURL: usr.avatar, usertype: userT, });
                     } 
                 }
             );
@@ -348,17 +315,12 @@ router.post('/checkGatsbySig2', async function(req, res){
             console.log('User type:',usr.usertype);
             userT = usr.usertype;
         }
-
         if(config.testingData === 'true'){
             console.log(`Received at:\n${time}`);
             console.log(`User:${account}, auth:True.\nType:${userT}`);
         }
-        return RES.status(200).send({   auth: true, 
-                                        token: token, 
-                                        message: 'Access Granted!', 
-                                        profile_PicURL: usr.avatar,
-                                        usertype: userT,
-                                    });
+        saveLog(false, false,'log_in','','','','','',`login_method:${login_method}`,'','','',usr.username,userT,req.ip,time,'');
+        return RES.status(200).send({   auth: true, token: token, message: 'Access Granted!', profile_PicURL: usr.avatar, usertype: userT, });
     });
 });
 

@@ -76,6 +76,7 @@ router.get('/alllogs', function(req, res){
 
 ///////////////////////////////////////////////////////////////////////
 /////////////Add OP logs
+///from now on we use the logs as main log handler and schema.
 router.post('/addOp',function(req, res){
     const time = new Date();
     // TODO verify token present on headers
@@ -84,20 +85,18 @@ router.post('/addOp',function(req, res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            OpLogs.create(req.body,function(err, logOP){
+            Logs.create(req.body,function(err, newLog){
                     if(err){
                         console.log('Error trying to add new Log on DB!',err);
-                        return res.status(500).send({ error: 1, message: 'Failed to add new log on Event'})
+                        return res.status(500).send({ status: 'failed', message: err });
                     }
                     if(logOP){ 
-                        // if(config.testingData){
-                        //     console.log(`Request by system to add OP made:${time}`);
-                        //     console.log(`logID:${logOP.id} created.`);
-                        // }
-                        return res.status(200).send({ result: "Sucess!", logID: logOP.id});
+                        return res.status(200).send({ result: "sucess", result: `Log added. ${newLog._id}`});
                     }
                 }
             );
+        }else{
+            return res.status(404).send({ status: 'failed', message: 'Failed to decode token.'});
         }
     });
 })

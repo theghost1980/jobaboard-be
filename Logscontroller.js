@@ -10,6 +10,24 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 const time = new Date();
 
+////multer as middleware to being able to interact with the body.formdata
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Destination:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, __dirname + '/uploads')
+    },
+    filename: function (req, file, callback) {
+        if(config.testingData){ 
+            (file) ? console.log('Filename:::::::File::::::',file) : console.log('No file from client');
+        }
+        callback(null, file.fieldname + '_' + Date.now() + "_" + file.originalname);
+    }
+});  
+const upload = multer({ storage: storage }).single("file");
+
 //get logs using a filter
 router.get('/getLogs',function(req,res){
     const token = req.headers['x-access-token'];
@@ -85,16 +103,18 @@ router.post('/addOp',function(req, res){
     jwt.verify(token, config.secret, function(err, decoded){
         if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
-            Logs.create(req.body,function(err, newLog){
+            upload(req, res, function(err){
+                if(err) return res.status(500).send({ status: 'failed', message: err });
+                Logs.create(req.body,function(err, newLog){
                     if(err){
                         console.log('Error trying to add new Log on DB!',err);
                         return res.status(500).send({ status: 'failed', message: err });
                     }
-                    if(logOP){ 
+                    if(newLog){ 
                         return res.status(200).send({ result: "sucess", result: `Log added. ${newLog._id}`});
                     }
-                }
-            );
+                });
+            });
         }else{
             return res.status(404).send({ status: 'failed', message: 'Failed to decode token.'});
         }

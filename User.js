@@ -29,28 +29,23 @@ var UserSchema = new mongoose.Schema({
     email: String,
     pk: String,
     usertype: String,
+    settings: {
+        bee_settings: {
+            dm: {
+                only_from_friends: {
+                    type: Boolean,
+                    default: false,
+                },
+                show_preview_always: {
+                    type: Boolean,
+                    default: false,
+                },
+            }
+        },
+    },
     __v: { type: Number, select: false },
     createdAt: Date,
     updatedAt: Date,
-    holding: {
-        type: [String],
-        default: [],
-    }, //this i think is the best way to relate the instances each user has. i.e: AKA,TOK,COKE. Means this user has instances of those 3 symbol tokens.
-    nfts: [{ //an array of objects. each object is one instance
-        ntf_id: Number, 
-        ntf_symbol: String, 
-        nft_instance_id: Number,
-        burned: {
-            type: Boolean,
-            default: false,
-        }, 
-        price: Number, //to be set/updated first on hive, then here. Ideally to handle this only on marketPlace.
-        on_sale: {
-            type: Boolean,
-            default: false,
-        },
-        thumb: String, //dunno if I will use it but leave it here for later
-    }],
 });
 mongoose.model('User',UserSchema);
 

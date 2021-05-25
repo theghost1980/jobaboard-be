@@ -12,6 +12,26 @@ var config = require('./config');
 const { Client, Signature, cryptoUtils } = require('@hiveio/dhive');
 const client = new Client(config.apiHive);
 
+//from now on, at the top of each controller, if needed, the handling function to create the logs.
+function saveLog(from_req,is_system=false, log_type='',action='',note='', txID='',op='',totalSteps='',result='',error='',descError='',data='',username='',usertype='',ipaddress='',createdAt='',event=''){
+    // is_system: Boolean,
+    // log_type: String, //as 'login', 'logout', 'support', 'marketplace', 'operation'
+    // action: String, //if needed as 'buy','sell','edit','query'
+    const log = { is_system: is_system,log_type: log_type, action: action, txID: txID,op: op,totalSteps: totalSteps, result: result,error: error,descError: descError,data: data,username: username,usertype: usertype,ipaddress: ipaddress,createdAt: createdAt,event: event,};
+    const logCleaned = {};
+    Object.entries(log).forEach(([key,value]) => {
+        if(value !== '' && value !== null && value !== undefined){ logCleaned[key]= value; };
+    });
+    Logs.create(logCleaned, function(err, log){
+        if(err){ 
+            console.log('Error trying to add new Log on DB!', err);
+            if(config.testingData){ console.log('Error saving this log:', logCleaned )};
+        }
+        if(from_req){ return res.status(200).send({ status: 'sucess', result: log })};
+        }
+    );
+}
+
 // TODO: Check with the tutorial too see if the code match or there is an eror related to the password checks/assignments.
 
 //la logica como yo lo entiendo:
@@ -248,21 +268,7 @@ router.post('/checkGatsbySig', async function(req, res){
                     //if found returns it foto profile, if not present send hive profilePICurl
                     //if not found register as new on db.
                     //create log
-                    Logs.create({
-                        username: account,
-                        usertype: userT,
-                        createdAt: time,
-                        ipaddress: req.ip,
-                        event: 'Login in',
-                        banned: banned,
-                        },
-                        function(err, log){
-                            if(err){console.log('Error trying to add new Log on DB!',err)}
-                            if(log){ 
-                                console.log(`logID:${log.id}`);
-                            } 
-                        }
-                    );
+                    saveLog(false, false,'log_in','none',banned,'','','','','','','',account,userT,req.ip,time,'');
                     if(config.testingData === 'true'){
                         console.log(`Received at:\n${time}`);
                         console.log(`User:${account}, auth:True.\nType:${userT}`);

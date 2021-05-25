@@ -78,6 +78,23 @@ router.get('/JobsQuery',function(req,res){
 // - tx money transfers
 // on ssc:
 // - nft created, actual nft, instances.
+
+///public route for hive contract/table queries
+router.get('/publicQueryContractTable', function(req,res){
+    const query = req.headers['query']; //as { contract: '', table: '', query: {}, limit: 0, offset: 0, indexes: [] };
+    if(!query) return res.status(404).send({ status: 'failed', message: 'No query provided!' });
+    const pQuery = JSON.parse(query);
+    if(config.testingData){ console.log('About to process:', pQuery)};
+    ssc.find(pQuery.contract, pQuery.table, pQuery.query, pQuery.limit, pQuery.offset, pQuery.indexes, (err, result) => {
+        if(err){
+            if(config.testingData){ console.log('Error on query:', query) };
+            return res.status(500).send({ status: 'failed', message: err });
+        }
+        if(config.testingData){ console.log('Results', result)};
+        return res.status(200).send({ status: 'sucess', result: result });
+    });
+});
+/////
 router.get('/tx', function(req, res){ //loop up for money transfers.
     //testing to look up a particular tx on the test SSC server
     const tx = req.headers['tx'];

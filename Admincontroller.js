@@ -6,6 +6,7 @@ router.use(bodyParser.json());
 var User = require('./User');
 var Logs = require('./Logs');
 var Job = require('./Job');
+const Faq = require('./Faq');
 const Orders = require('./Orders');
 const Main_menu = require('./Main_menu'); //so the admins can modify on JAB, CRUD this schema.
 const Nft = require('./Nft');
@@ -350,6 +351,33 @@ router.post('/updateMmenuJab', function(req,res){
     });
 });
 ///////END Main_menu handling CRUD///////
+
+///////handle FAQ section///////////
+//////GET query on FAQs
+router.get('/getFaq', function(req,res){
+    const token = req.headers['x-access-token']; //query= {'filter': {}, 'limit': 0, 'sort': {} }; sort as { createdAt: -1 };
+    const query = JSON.parse(req.headers['query']);
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    if(!query) return res.status(404).send({ auth: false, message: 'No query provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            if(config.testingData){ console.log('filtering on FAQ Admin', query); };
+            Faq.find(query.filter, function(err, faqs){
+                if(err){
+                    if(config.testingData) {console.log('Error finding FAQ',err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', result: faqs });
+            }).sort(query.sort).limit(query.limit);
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+});
+//////END Get query on FAQs
+
+///////END handle FAQ section///////////
 
 ///////Job sections controlled by Admins
 ///////////handling job queries from admins

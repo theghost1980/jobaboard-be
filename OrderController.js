@@ -266,13 +266,15 @@ router.post('/createOrder', function(req,res){
         if(err) return res.status(404).send({ auth: false, message: 'Failed to authenticate token.' });
         if(decoded){
             //maybe just check if job_title exists 
+            const warning = {};
             Order.findOne(jsonFilter , function(err, found){
                 if(err){
                     if(config.testingData){ console.log('Error processing order', err)}
                     return res.status(500).send({ status: 'failed', message: err});
                 }
                 if(found){//we send a warning messsage to user to double check as there is one order similiar to this one
-                    return res.status(500).send({ status: 'warning', message: 'There is one Gig/Job using the same title, please double check before proceeding. Click on the link bellow to open the related order in a new window.'});
+                    // return res.status(500).send({ status: 'warning', message: 'There is one Gig/Job using the same title, please double check before proceeding. Click on the link bellow to open the related order in a new window.'});
+                    warning.message = "JAB has detected an active order with the same title. Please double check if you may need to cancel one of them.";
                 }
                 //now using multer to process the formdata
                 //now multer will work...work b
@@ -294,7 +296,7 @@ router.post('/createOrder', function(req,res){
                                 if(config.testingData){ console.log('Error when creating a new order!',err)};
                                 return res.status(500).send({ status: 'failed', message: err});
                             }
-                            res.status(200).send({ status: 'sucess', result: newOrder});
+                            res.status(200).send({ status: 'sucess', result: newOrder, message: warning.message ? warning.message : "nada" });
                         });
                     }
                 });

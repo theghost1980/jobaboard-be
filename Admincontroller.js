@@ -375,6 +375,67 @@ router.get('/getFaq', function(req,res){
         }
     });
 });
+
+router.post('/handleFaq', function(req,res){
+    const token = req.headers['x-access-token'];
+    const query = JSON.parse(req.headers['query']); //as query = { 'operation': 'create,delete', 'faq_id': 'String' };
+    if(!query || !query.operation){ return res.status(404).send({ status: 'failed', message: 'Operation or query not provided!'})};
+    if(!token) return res.status(404).send({ auth: false, message: 'No token provided!' });
+    jwt.verify(token, config.secret, function(err, decoded){
+        if(err) return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        if(decoded){
+            uploadMultiple(req, res, function(err){
+                if(err){
+                    if(config.testingData){ console.log('Error multer, faq processing.', err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                if(req.files && query.operation === 'create'){
+                    let res_promises = req.files.map(file => new Promise((resolve,reject) => {
+                        cloudinary.uploader.upload(file.path,{ tags: ['imageFAQ','jobabord']}, function(err, image){
+                            if(err) reject(err) 
+                            else {
+                                resolve(image.secure_url);
+                                fs.unlink(file.path, resultHandler);
+                            }
+                        })
+                    }));
+                    Promise.all(res_promises).then(result => { //result is the array holding the images as we need them.
+                        const images = result;
+                        saveDataFAQ(req, images);
+                    }).catch((error) => res.status(500).send({ status: 'failed', message: error }) );
+                }else{
+                    saveDataFAQ(req, null);
+                }
+            });
+        }else{
+            return res.status(500).send({ auth: false, message: 'Failed to decode token.' });
+        }
+    });
+
+    function saveDataFAQ(req, images){
+        if(query.operation === 'create'){
+            const data = req.body;
+            if(images){
+                data.images = images;
+            }
+            Faq.create(data, function(err, newFaq){
+                if(err){
+                    if(config.testingData){ console.log('Error handling FAQ', err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', message: `FAQ created.`, result: newFaq });
+            });
+        }else{ //just delete for now. Edit later on.
+            Faq.findByIdAndDelete(query.faq_id, function(err, result){
+                if(err){
+                    if(config.testingData){ console.log('Error deleting FAQ', err)};
+                    return res.status(500).send({ status: 'failed', message: err });
+                }
+                return res.status(200).send({ status: 'sucess', message: `FAQ Deleted.`, result: result });
+            });
+        }
+    }
+});
 //////END Get query on FAQs
 
 ///////END handle FAQ section///////////

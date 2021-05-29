@@ -415,6 +415,7 @@ router.post('/handleFaq', function(req,res){
     function saveDataFAQ(req, images){
         if(query.operation === 'create'){
             const data = req.body;
+            data.questions_list = JSON.parse(data.questions_list);
             if(images){
                 data.images = images;
             }

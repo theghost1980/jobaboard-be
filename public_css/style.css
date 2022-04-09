@@ -4,13 +4,14 @@ body {
 	font-family: 'Roboto', sans-serif;
 	font-size: 16px;
 	color: #222;
-	background-color: #ECF0F1;
+	background-color: #ecd698;
 	text-align: center;
 }
 
 .container {
 	padding: 0;
 	margin-top: 40px;
+	text-align: center;
 }
 
 .footer {

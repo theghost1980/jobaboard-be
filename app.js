@@ -61,6 +61,12 @@ app.use(config.handleNFTEP, NFTController);
 const OrderController = require('./OrderController');
 app.use(config.ordersEP, OrderController);
 
+//base route as /
+app.route('/', (req,res) => {
+	res.status(200).json({ status: 'OK', req: req });
+
+});
+
 module.exports = app;
 
 // // testing using curl locally

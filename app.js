@@ -62,7 +62,7 @@ const OrderController = require('./OrderController');
 app.use(config.ordersEP, OrderController);
 
 //base route as /
-app.route('/', (req,res) => {
+app.get('/', (req,res) => {
 	res.status(200).json({ status: 'OK', req: req });
 
 });
